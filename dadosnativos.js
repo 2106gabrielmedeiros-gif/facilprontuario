@@ -124,8 +124,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Tipo de tórax</b></h3>\n<p>\n<b>Como Avaliar:</b> Durante a inspeção geral, observe o formato do tórax do paciente. Avalie o diâmetro anteroposterior (AP) em relação ao diâmetro lateral. Em um adulto normal, a relação entre o diâmetro AP e o diâmetro lateral é, normalmente, 0,7 a 0,9 e aumenta com o envelhecimento.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Tórax em tonel (em barril):</b> O diâmetro AP está aumentado. Esse formato é normal nos primeiros anos de vida e muitas vezes acompanha o envelhecimento e a doença pulmonar obstrutiva crônica.<br/>\n• <b>Tórax carinado (pectus carinatum):</b> O esterno apresenta deslocamento anterior, aumentando o diâmetro AP. Há depressão das cartilagens costais adjacentes ao esterno protruso.<br/>\n• <b>Tórax escavado (pectus excavatum):</b> Observe a depressão na porção inferior do esterno. A compressão do coração e dos grandes vasos pode causar sopros.\n</p>\n<br/>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "cardiovascular_1757801366762",
@@ -143,8 +142,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Simetria de tórax</b></h3>\n<p>\n<b>Como Avaliar:</b> Inspecione o tórax do paciente, comparando um lado com o outro para verificar a simetria dos movimentos respiratórios. Você pode colocar seus polegares ao longo de cada rebordo costal na parede torácica anterior ou posterior e pedir ao paciente para inspirar profundamente, observando a distância que seus polegares se afastam e a simetria da expansão da caixa torácica.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Simétrico:</b> Movimento igual de ambos os lados do tórax durante a respiração é o esperado.<br/>\n• <b>Assimétrico:</b> Uma diminuição ou um retardo unilateral da expansão torácica ocorre na fibrose crônica do pulmão ou pleura subjacente, derrame pleural, pneumonia lobar, dor pleurítica com imobilização associada, obstrução brônquica unilateral e paralisia do hemidiafragma.\n</p>\n<br/>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757801378995",
@@ -162,8 +160,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757801426933",
@@ -181,8 +178,7 @@ const examsData = {
                 }
               ],
               "info": '<h3><b>Baqueteamento digital</b></h3>\n<p>\n<b>Como Avaliar:</b> Inspecione a forma das unhas e dos dedos. O baqueteamento digital é um edema bulboso dos tecidos moles na base da unha, com desaparecimento do ângulo normal entre a unha e a prega ungueal proximal. O ângulo aumenta para 180° ou mais, e o leito ungueal se mostra esponjoso ou flutuante à palpação.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b> O baqueteamento digital é observado em cardiopatias congênitas, doença pulmonar intersticial e câncer de pulmão, doenças inflamatórias intestinais e processos malignos.\n</p>\n<br/> <img src="img/baqueteamento.png" alt="Baqueteamento digital" style="max-width:100%;">',
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757801584919",
@@ -200,8 +196,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Cianose</b></h3>\n<p>\n<b>Como Avaliar:</b> Inspecione a cor da pele e dos leitos ungueais. A cianose é uma coloração azulada da pele. A cianose central é melhor observada nos lábios, na mucosa oral e na língua. A cianose periférica é observada nas unhas, mãos e pés.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Cianose Central:</b> Indica diminuição do oxigênio no sangue, sugerindo problemas cardíacos ou pulmonares. Pode ser causada por shunt da direita para a esquerda em cardiopatias congênitas.<br/>\n• <b>Cianose Periférica:</b> Indica uma diminuição do fluxo sanguíneo para as extremidades, fazendo com que os tecidos extraiam mais oxigênio do sangue. Pode ser um reflexo normal ao frio ou pode indicar condições como insuficiência cardíaca ou choque.\n</p>\n<br/>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757801838203",
@@ -219,8 +214,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Edema de membros inferiores</b></h3>\n<p>\n<b>Como Avaliar:</b> Inspecione e palpe os membros inferiores, desde os pés até as coxas, procurando por inchaço. Pressione firmemente com o polegar por no mínimo 2 segundos sobre o dorso de cada pé, atrás de cada maléolo medial e sobre as tíbias para verificar a presença de edema depressível (cacifo).\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Edema com Cacifo:</b> Uma depressão que persiste após a pressão indica edema, que é o acúmulo de líquido intersticial. Pode ser causado por insuficiência cardíaca, síndrome nefrótica, cirrose hepática, ou insuficiência venosa crônica.<br/>\n• <b>Edema sem Cacifo (Linfedema):</b> O edema é firme e não depressível, e a pele pode estar espessada. Isso ocorre devido ao acúmulo intersticial de líquido rico em proteínas quando os canais linfáticos estão obstruídos.\n</p>\n<br/>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757802503288",
@@ -238,8 +232,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757802574159",
@@ -257,8 +250,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Sinais de insuficiência venosa crônica</b></h3>\n<p>\n<b>Como Avaliar:</b> Inspecione a pele dos membros inferiores, especialmente ao redor dos tornozelos. Procure por edema, pigmentação acastanhada, espessamento da pele e presença de úlceras, principalmente na região do maléolo medial.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b> Estes são sinais de estase venosa e hipertensão. O edema é mole e depressível. A pigmentação acastanhada ocorre com a cronicidade. A pele pode se tornar atrófica e vulnerável a ulcerações.\n</p>\n<br/>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             }
           ]
         },
@@ -291,8 +283,7 @@ const examsData = {
                 }
               ],
               "info": "<h2>A. B1 ALTA</h2>\n    <p>A primeira bulha cardíaca (B₁) pode estar anormalmente alta devido a:</p>\n    \n    <h3>Contrações ventriculares vigorosas</h3>\n    <p>Isso acontece em situações como febre e estimulação simpática (por exemplo, com o uso de inaladores beta-adrenérgicos ou em casos de tireotoxicose).</p>\n    \n    <h3>Fechamento tardio da valva mitral</h3>\n    \n    <h4>a. Prolapso da valva mitral</h4>\n    <p>Em pacientes com o sopro de regurgitação mitral, uma bulha B₁ alta pode ser um indício de prolapso inicial da valva mitral (embora muitos pacientes com regurgitação mitral tenham uma B₁ normal ou suave).</p>\n    <p>A bulha B₁ é alta nesses pacientes porque os folhetos que se prolapsam param de se mover e se tensionam mais tarde do que o normal, quando a taxa de mudança de pressão no ventrículo é maior.</p>\n    \n    <h4>b. Estenose Mitral</h4>\n    <p>Noventa por cento dos pacientes com estenose mitral pura e descomplicada têm uma bulha B₁ alta.</p>\n    <p>Como o sopro da estenose mitral é frequentemente difícil de ouvir, um ensinamento tradicional é que os médicos devem suspeitar de estenose mitral em qualquer paciente com uma B₁ alta sem explicação e ouvir atentamente o sopro com o paciente deitado sobre o lado esquerdo. A estenose mitral retarda o fechamento da valva mitral porque o gradiente de pressão entre o átrio esquerdo e o ventrículo esquerdo mantém os folhetos abertos até o momento da sístole ventricular.</p>\n    <p>Após uma valvuloplastia bem-sucedida, a bulha B₁ se torna mais suave.</p>\n    \n    <h4>c. Mixoma Atrial Esquerdo</h4>\n    <p>Muitos pacientes com mixoma atrial esquerdo (7 em 9 em uma série) também têm uma bulha B₁ alta porque o tumor que cai no orifício mitral durante a diástole retarda o fechamento da valva.</p>\n    \n    <h2>B. B₁ FRACA OU AUSENTE</h2>\n    <p>A bulha B₁ é excepcionalmente fraca se as contrações ventriculares forem fracas ou se a valva mitral já estiver fechada quando a sístole ventricular ocorre.</p>\n    \n    <h3>1. Contrações Ventriculares Fracas</h3>\n    <p>Exemplos comuns de contrações fracas que causam uma S₁ fraca são o infarto do miocárdio e o bloqueio do ramo esquerdo.</p>\n    \n    <h3>2. Fechamento Precoce da Valva Mitral</h3>\n    <p>Causas comuns de fechamento precoce da valva mitral que causam uma S₁ fraca incluem o seguinte:</p>\n    \n    <h4>a. Intervalo PR Longo (>0.20 segundos)</h4>\n    \n    <h4>b. Regurgitação Aórtica Aguda</h4>\n    <p>Em pacientes com sopro de regurgitação aórtica, a bulha S₁ fraca ou ausente é uma pista importante de que a regurgitação é aguda (por exemplo, endocardite) e não crônica.</p>\n    <p>Pacientes com regurgitação aórtica aguda têm pressões diastólicas finais no ventrículo esquerdo (LV) muito mais altas do que aqueles com regurgitação crônica, porque a valva que falha agudamente não deu tempo para o ventrículo aumentar de tamanho, como acontece para compensar a regurgitação crônica.</p>\n    <p>As altas pressões no ventrículo acabam excedendo as pressões diastólicas atriais esquerdas, fechando a valva mitral antes da sístole ventricular e, portanto, tornando a bulha S₁ fraca ou ausente.</p>\n    \n    <h2>C. INTENSIDADE VARIÁVEL DA B₁</h2>\n    <p>Se o ritmo do pulso arterial é regular mas a intensidade da bulha B₁ varia, a única explicação possível é que o intervalo PR está mudando de batimento para batimento, o que significa que o paciente tem dissociação atrioventricular.</p>\n    <p>Em contraste, em pacientes com ritmos irregulares, a mudança na intensidade da B₁ não tem significado diagnóstico, porque o enchimento ventricular e a taxa de mudança de pressão — e, portanto, a intensidade da B₁ — dependem completamente do comprimento do ciclo.</p>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "cardiovascular_1757802062616",
@@ -310,8 +301,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Ritmo cardíaco regular versus irregular</b></h3>\n<p>\n<b>Como Avaliar:</b> Palpe o pulso radial e ausculte o coração. Avalie se os batimentos ocorrem em um ritmo constante. Se o ritmo for irregular, tente identificar um padrão (por exemplo, irregularmente regular ou irregularmente irregular). Um ECG é necessário para um diagnóstico definitivo.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Ritmo Regular:</b> Batimentos em intervalos consistentes, como no ritmo sinusal normal.<br/>\n• <b>Ritmo Irregular:</b> Pode ser causado por extrassístoles (batimentos prematuros), que são comuns e muitas vezes benignas, ou por arritmias mais sérias como a fibrilação atrial, onde o ritmo é \"irregularmente irregular\".\n</p>\n<br/>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "cardiovascular_1757802133536",
@@ -329,8 +319,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Desdobramentos de bulha</b></h3>\n<p>\n<b>Como Avaliar:</b> Ausculte o coração, especialmente no segundo espaço intercostal esquerdo, com o diafragma do estetoscópio. Peça ao paciente para respirar calma e depois profundamente. O desdobramento fisiológico da segunda bulha cardíaca (B2) é a audição de dois componentes (A2 e P2) durante a inspiração, que se fundem em um único som na expiração.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Desdobramento Fisiológico:</b> Normal, causado pelo fechamento retardado da valva pulmonar devido ao aumento do retorno venoso para o coração direito durante a inspiração.<br/>\n• <b>Desdobramento Fixo:</b> O desdobramento de B2 que não varia com a respiração é um sinal clássico de defeito do septo interatrial.<br/>\n• <b>Desdobramento Paradoxal ou Invertido:</b> O desdobramento aparece durante a expiração e desaparece na inspiração. A causa mais comum é o bloqueio de ramo esquerdo.\n</p>\n<br/>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "cardiovascular_1757802179105",
@@ -353,8 +342,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Sopros cardíacos</b></h3>\n<p>\n<b>Como Avaliar:</b> Ausculte o coração em todas as áreas precordiais com o diafragma e a campânula do estetoscópio. Se um sopro for detectado, caracterize-o quanto a: tempo no ciclo cardíaco (sistólico ou diastólico), formato, localização de intensidade máxima, irradiação, intensidade (grau I a VI), tom e qualidade. Manobras como pedir ao paciente para sentar e inclinar-se para frente podem acentuar certos sopros.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b> Sopros são causados por fluxo sanguíneo turbulento e podem ser \"inocentes\" (fisiológicos) ou patológicos.<br/>\n• <b>Sopros Sistólicos:</b> Podem ser inocentes ou indicar patologias como estenose aórtica ou regurgitação mitral.<br/>\n• <b>Sopros Diastólicos:</b> São quase sempre patológicos, indicando estenose mitral ou regurgitação aórtica.\n</p>\n<br/>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "cardiovascular_1757802211756",
@@ -372,8 +360,7 @@ const examsData = {
                 }
               ],
               "info": "<b> teste </b>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             }
           ]
         },
@@ -401,8 +388,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Desvio de ictus cordis</b></h3>\n<p>\n<b>Como Avaliar:</b> Palpe o precórdio para localizar o impulso apical, ou ponto de impulso máximo (PIM), também conhecido como ictus cordis. Normalmente, é encontrado no quinto espaço intercostal esquerdo, na linha medioclavicular ou medial a ela, com um diâmetro de 1 a 2,5 cm.\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Ictus Cordis Normal:</b> Indica um coração de tamanho normal.<br/>\n• <b>Desvio do Ictus Cordis:</b> Um desvio lateral na direção da linha axilar anterior, decorrente de dilatação ventricular, é observado na insuficiência cardíaca, miocardiopatia e doença cardíaca isquêmica.\n</p>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "cardiovascular_1757804870445",
@@ -420,8 +406,7 @@ const examsData = {
                 }
               ],
               "info": "<h3><b>Alteração de Pulsos Periféricos</b></h3>\n<p>\n<b>Como Avaliar:</b> A palpação dos pulsos arteriais periféricos é fundamental para avaliar a circulação arterial. Utilize as polpas dos dedos indicador e médio para palpar os seguintes pulsos bilateralmente, comparando a força entre os lados: radial, braquial, femoral, poplíteo, tibial posterior e dorsal do pé. A amplitude (força) do pulso é graduada em uma escala de 0 a 3+:<br/>\n• <b>3+:</b> Aumentado, enérgico<br/>\n• <b>2+:</b> Enérgico, esperado (normal)<br/>\n• <b>1+:</b> Diminuído, mais fraco que o esperado<br/>\n• <b>0:</b> Ausente, impossível de palpar\n</p>\n<br/>\n<p>\n<b>Significado dos Achados:</b><br/>\n• <b>Pulsos Diminuídos ou Ausentes (1+ ou 0):</b> Indicam comprometimento do fluxo sanguíneo para a extremidade. A causa mais comum é a doença arterial periférica (DAP) por aterosclerose. Uma ausência súbita de pulso sugere oclusão arterial aguda por um êmbolo ou trombo.<br/>\n• <b>Pulsos Aumentados (3+):</b> Pulsos enérgicos e amplos (\"fortes\") podem ser encontrados em condições que aumentam a pressão de pulso, como na regurgitação aórtica. Um pulso exagerado e localizado, como na artéria poplítea, pode sugerir um aneurisma.\n</p>",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             }
           ]
         }
@@ -457,8 +442,7 @@ const examsData = {
                 }
               ],
               "info": "<p>É uma avaliação com base no conjunto de dados exibidos pelo paciente e interpretados de acordo com a experiência de cada um. </p><p><br></p><p>Em outras palavras, é o que aparenta o paciente, visto em sua totalidade. Embora sugestiva, tem utilidade clínica. Para descrever a impressão obtida, usase a seguinte nomenclatura: <strong>bom estado geral (BEG); regular estado geral (REG); mau estado geral (MEG)</strong>. A avaliação do estado geral tem utilidade prática, principalmente para se compreender até que ponto a doença atingiu o organismo, visto como um todo. Serve ainda de <strong>alerta para o médico nos casos com escassos sinais ou sintomas indicativos de uma determinada enfermidade, obrigando-o a aprofundar sua investigação diagnóstica</strong> na busca de uma afecção que justifique a deterioração do estado geral. Situação inversa também pode ocorrer, ou seja, a manutenção de bom estado geral, na presença de uma doença sabidamente grave. Isso indica uma boa capacidade de reação do organismo, o que tem, inclusive, valor prognóstico.</p><p><br></p><p>(Porto, 8ª Ed)</p>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "ectoscopia_1757813716697",
@@ -476,8 +460,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "ectoscopia_1757813728545",
@@ -495,8 +478,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "ectoscopia_1757813753494",
@@ -514,8 +496,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "ectoscopia_1757813781876",
@@ -533,8 +514,7 @@ const examsData = {
                 }
               ],
               "info": '<p>O edema, ou inchaço, refere-se ao acúmulo de líquido excessivo no espaço intersticial extravascular. O tecido intersticial é capaz de absorver até 5 litros de líquido, acomodando um ganho de peso de até 10%, antes do aparecimento de edema depressível. As causas variam de sistêmicas a locais. Concentre se na localização, no momento de manifestação e no contexto do edema e dos sintomas associados. “Alguma parte do seu corpo está inchada? Onde? Algum outro lugar? Quando ele ocorre? É pior pela manhã ou à noite? Seus sapatos ficam apertados?”</p><p><br></p><p>Com frequência as causas são cardíacas (disfunção ventricular direita ou esquerda, hipertensão pulmonar) ou pulmonares (doença pulmonar obstrutiva), mas também podem ser nutricionais (hipoalbuminemia) e/ou posturais. O edema postural aparece nas partes mais baixas do corpo: os pés e as pernas na posição sentada ou o sacro, quando o paciente está acamado. Anasarca é edema generalizado grave que se estende até o sacro e o abdome.</p> <img src="img/edema.jpeg" alt="Edema" style="max-width:100%;">',
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             },
             {
               "id": "ectoscopia_1757814453773",
@@ -552,8 +532,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "yes-no",
-              "likelihood": {}
+              "type": "yes-no"
             }
           ]
         },
@@ -596,8 +575,7 @@ const examsData = {
                 }
               ],
               "info": "<p>A percepção consciente do mundo exterior e de si mesmo caracteriza o estado de vigília, resultante da atividade de diversas áreas cerebrais, coordenadas pelo sistema reticular ativado ascendente. Entre o estado de vigília, em que está inteiramente consciente, e o estado comatoso, no qual o paciente perde a capacidade de identificar seu mundo interior e os acontecimentos do meio externo, é possível distinguir diversas fases intermediárias em uma graduação cujo principal indicador é o nível de consciência, assim esquematizado: </p><p><br></p><p><strong>Obnubilação</strong>: quando o nível de consciência é pouco comprometido, permanecendo o paciente em estado de alerta ainda que algo diminuído </p><p><strong>Sonolência</strong>: o paciente é facilmente despertado, responde mais ou menos apropriadamente, mas logo volta a dormir </p><p><strong>Confusão mental</strong>: configurase por perda de atenção, o pensamento não é claro, as respostas são lentas e não há uma percepção temporoespacial normal </p><p><strong>Torpor ou estupor</strong>: quando a alteração de consciência for mais pronunciada, mas o paciente ainda é capaz de ser despertado por estímulos mais fortes e tem movimentos espontâneos </p><p><strong>Coma</strong>: quando o paciente não for despertado por estímulos fortes e não tiver movimentos espontâneos.</p><p><br></p><p>(Porto, 8ª Ed.)</p>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "ectoscopia_1757813000362",
@@ -615,8 +593,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "ectoscopia_1757813020120",
@@ -634,8 +611,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             }
           ]
         },
@@ -673,8 +649,7 @@ const examsData = {
                 }
               ],
               "info": "<p> A fala depende de mecanismos bastante complexos que compreendem o órgão fonador, a laringe, os músculos da fonação e a elaboração cerebral. As alterações da fala classificam-se, basicamente, da seguinte maneira: </p><ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Disfonia ou afonia: </strong>é uma alteração do timbre da voz causada por alguma alteração no órgão fonador. A voz pode tornar-se rouca, fanhosa ou bitonal.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Dislalia</strong>: é o termo usado para designar alterações menores da fala, comuns em crianças, como a troca de letra (“tasa” por “casa”). Uma forma especial é a disritmolalia, que compreende distúrbios no ritmo da fala, incluindo a gagueira e a taquilalia </li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Disartria</strong>: decorre de alterações nos músculos da fonação, incoordenação cerebral (voz arrastada, escandida), hipertonia no parkinsonismo (voz baixa, monótona e lenta) ou perda do controle piramidal (paralisia pseudobulbar) </li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Disfasia</strong>: aparece com total normalidade do órgão fonador e dos músculos da fonação e depende de um distúrbio na elaboração cortical da fala. Há diversos graus de disfasia, desde mínimas alterações até perda total da fala.</li></ol>",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             }
           ]
         },
@@ -732,8 +707,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             }
           ]
         },
@@ -761,8 +735,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             },
             {
               "id": "ectoscopia_1757813612327",
@@ -790,8 +763,7 @@ const examsData = {
                 }
               ],
               "info": "",
-              "type": "multiple-choice",
-              "likelihood": {}
+              "type": "multiple-choice"
             }
           ]
         }
