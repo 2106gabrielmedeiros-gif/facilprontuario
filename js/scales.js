@@ -80,7 +80,7 @@ function renderScaleSelection() {
 
     const filtered = Object.values(allScales).filter(scale =>
         scale && scale.name && scale.name.toLowerCase().includes(filterText)
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     filtered.forEach(scale => {
         const card = document.createElement('div');
@@ -209,7 +209,7 @@ function renderQuestions() {
         const groupDiv = document.createElement('div');
         groupDiv.className = 'finding-group';
 
-        (scale.questions || []).forEach(question => {
+        (scale.questions || []).sort((a, b) => a.question.localeCompare(b.question)).forEach(question => {
             const stateObj = answersState[question.id];
             const findingWrapper = document.createElement('div');
             findingWrapper.className = 'finding-item';

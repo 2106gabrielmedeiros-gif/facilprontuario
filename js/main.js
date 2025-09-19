@@ -176,7 +176,7 @@ function renderExamSelection() {
     grid.innerHTML = '';
     const allExams = { ...examsData, ...customExams };
     const filterText = (document.getElementById('examSearchInput')?.value || '').toLowerCase();
-    const filtered = Object.values(allExams).filter(exam => exam.name.toLowerCase().includes(filterText));
+    const filtered = Object.values(allExams).filter(exam => exam.name.toLowerCase().includes(filterText)).sort((a, b) => a.name.localeCompare(b.name));
     filtered.forEach(exam => {
         const card = document.createElement('div');
         card.className = 'exam-card';
