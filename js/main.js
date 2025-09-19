@@ -47,6 +47,7 @@ function generateReportText() {
         Object.values(exam.findings).forEach(category => {
             const sentenceFindings = [];
             const lineFindings = [];
+            const negativeFindings = [];
 
             const sortedItems = reorderFindings(category.items || []);
 
@@ -61,6 +62,17 @@ function generateReportText() {
                 if (finding.type === 'open-text' && state.value) {
                     lineFindings.push(`${finding.reportLabel}: ${state.value}.`);
                 } else if (state.answerId !== undefined) {
+                    const answer = (finding.answers || []).find(a => a.id === state.answerId);
+                    if (answer && answer.isNegative) {
+                        // Remove "Nega" from the beginning of the description if it exists
+                        let description = answer.description || answer.text;
+                        if (description.toLowerCase().startsWith('nega ')) {
+                            description = description.substring(5);
+                        }
+                        negativeFindings.push(description);
+                        return; // Skip to the next finding
+                    }
+
                     const fullSentence = buildBranchSentence(finding, allExamFindings, findingsState);
 
                     if (state.detail) {
@@ -71,20 +83,43 @@ function generateReportText() {
                 }
             });
 
-            if (sentenceFindings.length === 0 && lineFindings.length === 0) return;
+            if (sentenceFindings.length === 0 && lineFindings.length === 0 && negativeFindings.length === 0) return;
 
-          if (sentenceFindings.length > 0) {
+            let categoryLine = `${category.name}: `;
+            let contentAdded = false;
+
+            if (sentenceFindings.length > 0) {
                 const finalSentence = sentenceFindings.map((sentence, index) => {
                     if (index > 0 && sentence && sentence.charAt(0) === sentence.charAt(0).toUpperCase() && sentence.charAt(0).toLowerCase() !== sentence.charAt(0)) {
                         return sentence.charAt(0).toLowerCase() + sentence.slice(1);
                     }
                     return sentence;
                 }).join(', ');
-
-                examSectionLines.push(`${category.name}: ${finalSentence.charAt(0).toUpperCase() + finalSentence.slice(1)}.`);
+                categoryLine += `${finalSentence.charAt(0).toUpperCase() + finalSentence.slice(1)}`;
+                contentAdded = true;
             }
+
+            if (negativeFindings.length > 0) {
+                if (contentAdded) {
+                    categoryLine += '. ';
+                }
+                categoryLine += `Nega ${negativeFindings.join(', ')}.`;
+                contentAdded = true;
+            } else {
+                 if (contentAdded) {
+                    categoryLine += '.';
+                 }
+            }
+
+            if(contentAdded) {
+                examSectionLines.push(categoryLine);
+            }
+
+
             if (lineFindings.length > 0) {
-                if (sentenceFindings.length === 0) examSectionLines.push(`${category.name}:`);
+                if (!contentAdded) {
+                    examSectionLines.push(`${category.name}:`);
+                }
                 lineFindings.forEach(line => examSectionLines.push(`  ${line}`));
             }
         });
@@ -326,19 +361,42 @@ function saveOpenTextAnswer(findingId, value) {
 }
 
 // ======== MODAIS (ADICIONAR/EDITAR) ========
-function addAnswerField(text = '', description = '') {
+function addAnswerField(text = '', description = '', isNegative = false) {
     const container = document.getElementById('answersContainer');
     const div = document.createElement('div');
     div.className = 'answer-input-group';
-    div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px; align-items: center; margin-bottom: 10px;';
+    div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px;';
+
     const textInput = document.createElement('input');
-    textInput.type = 'text'; textInput.value = text; textInput.placeholder = 'Texto do Botão'; textInput.className = 'answer-text';
+    textInput.type = 'text';
+    textInput.value = text;
+    textInput.placeholder = 'Texto do Botão';
+    textInput.className = 'answer-text';
+
     const descInput = document.createElement('input');
-    descInput.type = 'text'; descInput.value = description; descInput.placeholder = 'Texto para o Laudo (Descrição)'; descInput.className = 'answer-description';
+    descInput.type = 'text';
+    descInput.value = description;
+    descInput.placeholder = 'Texto para o Laudo (Descrição)';
+    descInput.className = 'answer-description';
+
+    const negativeLabel = document.createElement('label');
+    negativeLabel.style.cssText = 'display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9em;';
+    const negativeCheckbox = document.createElement('input');
+    negativeCheckbox.type = 'checkbox';
+    negativeCheckbox.checked = isNegative;
+    negativeCheckbox.className = 'is-negative-checkbox';
+    negativeLabel.appendChild(negativeCheckbox);
+    negativeLabel.appendChild(document.createTextNode('Achado negativo?'));
+
     const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-danger btn-small'; removeBtn.textContent = '×';
+    removeBtn.className = 'btn btn-danger btn-small';
+    removeBtn.textContent = '×';
     removeBtn.onclick = () => div.remove();
-    div.appendChild(textInput); div.appendChild(descInput); div.appendChild(removeBtn);
+
+    div.appendChild(textInput);
+    div.appendChild(descInput);
+    div.appendChild(negativeLabel);
+    div.appendChild(removeBtn);
     container.appendChild(div);
 }
 
@@ -417,7 +475,7 @@ function openEditFindingModal(examId, categoryKey, findingId) {
     document.getElementById('findingInfo').value = finding.info || '';
     const answersContainer = document.getElementById('answersContainer');
     answersContainer.innerHTML = '';
-    (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description));
+    (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description, ans.isNegative));
     document.getElementById('findingModalTitle').textContent = 'Editar Achado';
     document.getElementById('saveFindingBtn').onclick = () => saveFindingChanges(currentFinding);
     document.getElementById('findingModal').style.display = 'block';
@@ -449,7 +507,8 @@ function saveFinding(currentFinding) {
         const answers = Array.from(answerGroups).map(div => ({
             id: `ans_${Date.now()}_${Math.random()}`,
             text: div.querySelector('.answer-text').value.trim(),
-            description: div.querySelector('.answer-description').value.trim()
+            description: div.querySelector('.answer-description').value.trim(),
+            isNegative: div.querySelector('.is-negative-checkbox').checked
         })).filter(ans => ans.text);
         if (answers.length === 0) return alert('Preencha o texto de pelo menos uma resposta.');
         newFinding = {
@@ -507,7 +566,8 @@ function saveFindingChanges(currentFinding) {
     const answers = Array.from(answerGroups).map(div => ({
         id: `ans_${Date.now()}_${Math.random()}`,
         text: div.querySelector('.answer-text').value.trim(),
-        description: div.querySelector('.answer-description').value.trim()
+        description: div.querySelector('.answer-description').value.trim(),
+        isNegative: div.querySelector('.is-negative-checkbox').checked
     })).filter(ans => ans.text && ans.description);
 
     finding.answers = answers;
