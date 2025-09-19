@@ -39,7 +39,7 @@ function saveCustomData() {
         localStorage.setItem('customScales', JSON.stringify(customScales));
     }
     if (typeof customPrescriptions !== 'undefined') {
-        localStorage.setItem('customPrescriptionsData', JSON.stringify(customPrescriptions));
+        localStorage.setItem('customPrescriptions', JSON.stringify(customPrescriptions));
     }
 }
 
@@ -61,7 +61,7 @@ function loadCustomData() {
         if (cs) customScales = JSON.parse(cs);
     }
     if (typeof customPrescriptions !== 'undefined') {
-        const cp = localStorage.getItem('customPrescriptionsData');
+        const cp = localStorage.getItem('customPrescriptions');
         if (cp) customPrescriptions = JSON.parse(cp);
     }
 }

@@ -248,13 +248,4 @@ function deleteOption(optionId) {
 }
 
 // ======== PERSISTÊNCIA (localStorage) ========
-function saveCustomData() {
-    localStorage.setItem('customPrescriptionsData', JSON.stringify(customPrescriptions));
-}
-
-function loadCustomData() {
-    const data = localStorage.getItem('customPrescriptionsData');
-    if (data) {
-        customPrescriptions = JSON.parse(data);
-    }
-}
+// As funções saveCustomData e loadCustomData foram centralizadas em js/utils.js

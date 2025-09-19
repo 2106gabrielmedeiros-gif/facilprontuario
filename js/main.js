@@ -3,6 +3,7 @@ let selectedExams = [];
 let findingsState = {};
 let customExams = {};
 let customAdditions = {};
+let likelihoodData = {};
 
 // ======== INICIALIZAÇÃO ========
 document.addEventListener('DOMContentLoaded', function() {
