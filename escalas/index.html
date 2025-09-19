@@ -17,7 +17,7 @@
                     <button class="btn btn-primary btn-small" onclick="location.href='../prescricoes/index.html'">Acessar Prescrições</button>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="btn btn-secondary btn-small" onclick="exportData()">Exportar</button>
+                    <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('scales')">Exportar</button>
                     <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
                     <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
                     <button id="theme-toggle" class="theme-toggle-btn">?</button>
