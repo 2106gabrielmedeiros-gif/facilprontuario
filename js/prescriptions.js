@@ -46,7 +46,7 @@ function renderDiseaseSelection() {
 
     const filtered = Object.values(allPrescriptions).filter(p =>
         p && p.name && p.name.toLowerCase().includes(filterText)
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     filtered.forEach(disease => {
         const card = document.createElement('div');
@@ -144,7 +144,7 @@ function renderPrescriptionOptions() {
     const container = document.getElementById('optionsContainer');
     container.innerHTML = '';
 
-    (disease.options || []).forEach(option => {
+    (disease.options || []).sort((a, b) => a.name.localeCompare(b.name)).forEach(option => {
         const isCustom = selectedDiseaseId.startsWith('custom_');
         const item = document.createElement('div');
         item.className = 'prescription-item';
