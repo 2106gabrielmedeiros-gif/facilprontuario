@@ -109,6 +109,13 @@ body{font-family:'Inter',sans-serif;background-color:var(--cor-fundo);color:var(
 .btn-danger{background-color:var(--cor-perigo);color:#fff}
 .btn-small{padding:6px 12px;font-size:.8rem}
 
+label.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
 .result-area{background-color:var(--cor-fundo);border:1px solid var(--cor-borda);border-radius:8px;padding:20px;margin:20px 0;font-family:'Courier New',monospace;line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto}
 .preview-panel{position:fixed;right:20px;top:120px;width:300px;background:var(--cor-superficie);border:1px solid var(--cor-borda);border-radius:12px;padding:20px;box-shadow:var(--sombra-suave);max-height:calc(100vh - 140px);overflow-y:auto}
 .form-group{margin-bottom:15px}
@@ -221,4 +228,27 @@ body{font-family:'Inter',sans-serif;background-color:var(--cor-fundo);color:var(
     color: var(--cor-texto-principal);
     margin-top: 0;
     margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        position: static;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .header {
+        padding-bottom: 20px;
+    }
+    .header-actions .left-actions,
+    .header-actions > div:nth-child(2) {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    .header-actions .btn, .header-actions .btn-small, .header-actions label.btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+    }
 }
