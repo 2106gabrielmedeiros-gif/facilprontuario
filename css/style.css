@@ -49,7 +49,6 @@ body{font-family:'Inter',sans-serif;background-color:var(--cor-fundo);color:var(
 }
 
 .header-actions > div:nth-child(2) > .btn {
-    width: 100px;
     text-align: center;
     justify-content: center;
     box-sizing: border-box;
