@@ -45,7 +45,8 @@ function generateReportText() {
         const examSectionLines = [];
 
         Object.values(exam.findings).forEach(category => {
-            const sentenceFindings = [];
+            const positiveSentenceFindings = [];
+            const negativeSentenceFindings = [];
             const lineFindings = [];
 
             const sortedItems = reorderFindings(category.items || []);
@@ -61,30 +62,55 @@ function generateReportText() {
                 if (finding.type === 'open-text' && state.value) {
                     lineFindings.push(`${finding.reportLabel}: ${state.value}.`);
                 } else if (state.answerId !== undefined) {
-                    const fullSentence = buildBranchSentence(finding, allExamFindings, findingsState);
+                    const answer = (finding.answers || []).find(a => a.id === state.answerId);
+                    if (!answer) return;
 
-                    if (state.detail) {
-                        sentenceFindings.push(`${fullSentence} (${state.detail})`);
+                    if (answer.isNegative) {
+                        const questionText = finding.question.toLowerCase().replace('?', '').trim();
+                        negativeSentenceFindings.push(questionText);
                     } else {
-                        sentenceFindings.push(fullSentence);
+                        const fullSentence = buildBranchSentence(finding, allExamFindings, findingsState);
+                        if (state.detail) {
+                            positiveSentenceFindings.push(`${fullSentence} (${state.detail})`);
+                        } else {
+                            positiveSentenceFindings.push(fullSentence);
+                        }
                     }
                 }
             });
 
-            if (sentenceFindings.length === 0 && lineFindings.length === 0) return;
+            if (positiveSentenceFindings.length === 0 && negativeSentenceFindings.length === 0 && lineFindings.length === 0) return;
 
-          if (sentenceFindings.length > 0) {
-                const finalSentence = sentenceFindings.map((sentence, index) => {
+            let categorySentences = [];
+
+            if (positiveSentenceFindings.length > 0) {
+                const finalPositiveSentence = positiveSentenceFindings.map((sentence, index) => {
                     if (index > 0 && sentence && sentence.charAt(0) === sentence.charAt(0).toUpperCase() && sentence.charAt(0).toLowerCase() !== sentence.charAt(0)) {
                         return sentence.charAt(0).toLowerCase() + sentence.slice(1);
                     }
                     return sentence;
                 }).join(', ');
-
-                examSectionLines.push(`${category.name}: ${finalSentence.charAt(0).toUpperCase() + finalSentence.slice(1)}.`);
+                categorySentences.push(finalPositiveSentence.charAt(0).toUpperCase() + finalPositiveSentence.slice(1));
             }
+
+            if (negativeSentenceFindings.length > 0) {
+                const lastNegative = negativeSentenceFindings.pop();
+                let negativePart = negativeSentenceFindings.join(', ');
+                if (negativePart) {
+                    negativePart += ` e ${lastNegative}`;
+                } else {
+                    negativePart = lastNegative;
+                }
+                const finalNegativeSentence = `Nega ${negativePart}`;
+                categorySentences.push(finalNegativeSentence);
+            }
+
+            if (categorySentences.length > 0) {
+                 examSectionLines.push(`${category.name}: ${categorySentences.join('. ')}.`);
+            }
+
             if (lineFindings.length > 0) {
-                if (sentenceFindings.length === 0) examSectionLines.push(`${category.name}:`);
+                if (positiveSentenceFindings.length === 0 && negativeSentenceFindings.length === 0) examSectionLines.push(`${category.name}:`);
                 lineFindings.forEach(line => examSectionLines.push(`  ${line}`));
             }
         });
@@ -326,19 +352,32 @@ function saveOpenTextAnswer(findingId, value) {
 }
 
 // ======== MODAIS (ADICIONAR/EDITAR) ========
-function addAnswerField(text = '', description = '') {
+function addAnswerField(text = '', description = '', isNegative = false) {
     const container = document.getElementById('answersContainer');
     const div = document.createElement('div');
     div.className = 'answer-input-group';
-    div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px; align-items: center; margin-bottom: 10px;';
+    div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px;';
     const textInput = document.createElement('input');
     textInput.type = 'text'; textInput.value = text; textInput.placeholder = 'Texto do Botão'; textInput.className = 'answer-text';
     const descInput = document.createElement('input');
     descInput.type = 'text'; descInput.value = description; descInput.placeholder = 'Texto para o Laudo (Descrição)'; descInput.className = 'answer-description';
+
+    const negativeWrapper = document.createElement('label');
+    negativeWrapper.style.cssText = 'display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap;';
+    const negativeCheckbox = document.createElement('input');
+    negativeCheckbox.type = 'checkbox';
+    negativeCheckbox.className = 'answer-is-negative';
+    negativeCheckbox.checked = isNegative;
+    negativeWrapper.appendChild(negativeCheckbox);
+    negativeWrapper.appendChild(document.createTextNode('Achado negativo?'));
+
     const removeBtn = document.createElement('button');
     removeBtn.className = 'btn btn-danger btn-small'; removeBtn.textContent = '×';
     removeBtn.onclick = () => div.remove();
-    div.appendChild(textInput); div.appendChild(descInput); div.appendChild(removeBtn);
+    div.appendChild(textInput);
+    div.appendChild(descInput);
+    div.appendChild(negativeWrapper);
+    div.appendChild(removeBtn);
     container.appendChild(div);
 }
 
@@ -352,7 +391,7 @@ function openFindingModal(examId, categoryKey = null, condition = null) {
     document.getElementById('answersContainer').innerHTML = '';
     document.getElementById('findingInfo').value = '';
     addAnswerField('Sim', '');
-    addAnswerField('Não', '');
+    addAnswerField('Não', '', true);
     document.getElementById('findingModalTitle').textContent = 'Adicionar Novo Achado';
     document.getElementById('saveFindingBtn').onclick = () => saveFinding({ examId, categoryKey });
 
@@ -417,7 +456,7 @@ function openEditFindingModal(examId, categoryKey, findingId) {
     document.getElementById('findingInfo').value = finding.info || '';
     const answersContainer = document.getElementById('answersContainer');
     answersContainer.innerHTML = '';
-    (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description));
+    (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description, ans.isNegative));
     document.getElementById('findingModalTitle').textContent = 'Editar Achado';
     document.getElementById('saveFindingBtn').onclick = () => saveFindingChanges(currentFinding);
     document.getElementById('findingModal').style.display = 'block';
@@ -449,7 +488,8 @@ function saveFinding(currentFinding) {
         const answers = Array.from(answerGroups).map(div => ({
             id: `ans_${Date.now()}_${Math.random()}`,
             text: div.querySelector('.answer-text').value.trim(),
-            description: div.querySelector('.answer-description').value.trim()
+            description: div.querySelector('.answer-description').value.trim(),
+            isNegative: div.querySelector('.answer-is-negative').checked
         })).filter(ans => ans.text);
         if (answers.length === 0) return alert('Preencha o texto de pelo menos uma resposta.');
         newFinding = {
@@ -507,7 +547,8 @@ function saveFindingChanges(currentFinding) {
     const answers = Array.from(answerGroups).map(div => ({
         id: `ans_${Date.now()}_${Math.random()}`,
         text: div.querySelector('.answer-text').value.trim(),
-        description: div.querySelector('.answer-description').value.trim()
+        description: div.querySelector('.answer-description').value.trim(),
+        isNegative: div.querySelector('.answer-is-negative').checked
     })).filter(ans => ans.text && ans.description);
 
     finding.answers = answers;
