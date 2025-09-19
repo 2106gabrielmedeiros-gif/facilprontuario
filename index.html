@@ -12,12 +12,15 @@
             <h1>Prontuário Fácil</h1>
             <p>Versão 0.0.8</p>
            <div class="header-actions">
-                <button class="btn btn-primary btn-small" onclick="location.href='escalas/index.html'">Acessar Escalas</button>
-                <button class="btn btn-primary btn-small" onclick="openHelpModal()">Ajuda</button>
-                <div style="display: flex; gap: 8px;">
+                <div class="left-actions">
+                    <button class="btn btn-primary btn-small" onclick="location.href='escalas/index.html'">Acessar Escalas</button>
+                    <button class="btn btn-primary btn-small" onclick="openHelpModal()">Ajuda</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="btn btn-secondary btn-small" onclick="exportData()">Exportar</button>
                     <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
                     <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
+                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
                 </div>
             </div>
         </div>
