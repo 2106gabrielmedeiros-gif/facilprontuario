@@ -38,6 +38,9 @@ function saveCustomData() {
     if (typeof customScales !== 'undefined') {
         localStorage.setItem('customScales', JSON.stringify(customScales));
     }
+    if (typeof customPrescriptions !== 'undefined') {
+        localStorage.setItem('customPrescriptionsData', JSON.stringify(customPrescriptions));
+    }
 }
 
 function loadCustomData() {
@@ -56,6 +59,10 @@ function loadCustomData() {
     if (typeof customScales !== 'undefined') {
         const cs = localStorage.getItem('customScales');
         if (cs) customScales = JSON.parse(cs);
+    }
+    if (typeof customPrescriptions !== 'undefined') {
+        const cp = localStorage.getItem('customPrescriptionsData');
+        if (cp) customPrescriptions = JSON.parse(cp);
     }
 }
 
@@ -113,6 +120,9 @@ function exportData() {
     } else if (typeof customScales !== 'undefined') {
         dataToExport = { customScales };
         fileName = `escalas_config_${new Date().toISOString().slice(0,10)}.json`;
+    } else if (typeof customPrescriptions !== 'undefined') {
+        dataToExport = { customPrescriptions };
+        fileName = `prescricoes_config_${new Date().toISOString().slice(0,10)}.json`;
     }
 
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
@@ -139,6 +149,11 @@ function handleImport(file) {
                 saveCustomData();
                 renderScaleSelection();
                 alert('Escalas importadas com sucesso!');
+            } else if (typeof customPrescriptions !== 'undefined' && d.customPrescriptions) {
+                customPrescriptions = { ...customPrescriptions, ...d.customPrescriptions };
+                saveCustomData();
+                renderDiseaseSelection();
+                alert('Prescrições importadas com sucesso!');
             } else {
                 alert('Arquivo inválido.');
             }
