@@ -357,8 +357,13 @@ function addAnswerField(text = '', description = '', isNegative = false) {
     const div = document.createElement('div');
     div.className = 'answer-input-group';
     div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px;';
+    
     const textInput = document.createElement('input');
-    textInput.type = 'text'; textInput.value = text; textInput.placeholder = 'Texto do Botão'; textInput.className = 'answer-text';
+    textInput.type = 'text';
+    textInput.value = text;
+    textInput.placeholder = 'Texto do Botão';
+    textInput.className = 'answer-text';
+
     const descInput = document.createElement('input');
     descInput.type = 'text'; descInput.value = description; descInput.placeholder = 'Texto para o Laudo (Descrição)'; descInput.className = 'answer-description';
 
@@ -372,8 +377,10 @@ function addAnswerField(text = '', description = '', isNegative = false) {
     negativeWrapper.appendChild(document.createTextNode('Achado negativo?'));
 
     const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-danger btn-small'; removeBtn.textContent = '×';
+    removeBtn.className = 'btn btn-danger btn-small';
+    removeBtn.textContent = '×';
     removeBtn.onclick = () => div.remove();
+    
     div.appendChild(textInput);
     div.appendChild(descInput);
     div.appendChild(negativeWrapper);
