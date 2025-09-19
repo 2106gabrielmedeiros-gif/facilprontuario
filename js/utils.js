@@ -110,19 +110,46 @@ function masterReset() {
     }
 }
 
-function exportData() {
+function exportData(type) {
     let dataToExport = {};
     let fileName = 'config.json';
 
-    if (typeof customExams !== 'undefined') {
-        dataToExport = { customExams, customAdditions, likelihoodData };
-        fileName = 'laudos_config.json';
-    } else if (typeof customScales !== 'undefined') {
-        dataToExport = { customScales };
-        fileName = `escalas_config_${new Date().toISOString().slice(0,10)}.json`;
-    } else if (typeof customPrescriptions !== 'undefined') {
-        dataToExport = { customPrescriptions };
-        fileName = `prescricoes_config_${new Date().toISOString().slice(0,10)}.json`;
+    switch (type) {
+        case 'exams':
+            if (typeof customExams !== 'undefined' && Object.keys(customExams).length > 0) {
+                dataToExport = { customExams, customAdditions, likelihoodData };
+                fileName = 'laudos_config.json';
+            } else {
+                alert('Nenhum dado de exame customizado para exportar.');
+                return;
+            }
+            break;
+        case 'scales':
+            if (typeof customScales !== 'undefined' && Object.keys(customScales).length > 0) {
+                dataToExport = { customScales };
+                fileName = `escalas_config_${new Date().toISOString().slice(0,10)}.json`;
+            } else {
+                alert('Nenhum dado de escala customizada para exportar.');
+                return;
+            }
+            break;
+        case 'prescriptions':
+            if (typeof customPrescriptions !== 'undefined' && Object.keys(customPrescriptions).length > 0) {
+                dataToExport = { customPrescriptions };
+                fileName = `prescricoes_config_${new Date().toISOString().slice(0,10)}.json`;
+            } else {
+                alert('Nenhum dado de prescrição customizada para exportar.');
+                return;
+            }
+            break;
+        default:
+            alert('Tipo de exportação desconhecido.');
+            return;
+    }
+
+    if (Object.keys(dataToExport).length === 0) {
+        alert('Nenhum dado para exportar.');
+        return;
     }
 
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
