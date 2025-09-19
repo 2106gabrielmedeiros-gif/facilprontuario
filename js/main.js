@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCustomData();
     renderExamSelection();
     loadSessionState();
+    setupTheme();
     const panel = document.getElementById('previewPanel');
     const btn = document.getElementById('togglePreviewBtn');
     if (panel && btn) {

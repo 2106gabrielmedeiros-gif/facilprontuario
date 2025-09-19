@@ -12,11 +12,14 @@
             <h1>Prontuário Fácil - Escalas Médicas</h1>
             <p>Aplique escalas com cálculo automático de pontuação.</p>
            <div class="header-actions">
-                <button class="btn btn-primary btn-small" onclick="location.href='../index.html'">Voltar</button>
-                <div style="display: flex; gap: 8px;">
+                <div class="left-actions">
+                    <button class="btn btn-primary btn-small" onclick="location.href='../index.html'">Voltar</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="btn btn-secondary btn-small" onclick="exportData()">Exportar</button>
                     <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
                     <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
+                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
                 </div>
             </div>
         </div>
@@ -62,12 +65,12 @@
         <button class="btn btn-secondary" onclick="backToSelection()">Voltar</button>
         <button class="btn btn-primary" onclick="generateReport()">Gerar Resultado</button>
     </div>
-  
-            <div id="previewPanel" class="preview-panel">
-                <h3>Pré-visualização do Resultado</h3>
-                <div id="previewContent">Selecione as respostas...</div>
-            </div>
-        </div>
+    <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
+    <div id="previewPanel" class="preview-panel">
+        <h3>Pré-visualização do Resultado</h3>
+        <div id="previewContent">Selecione as respostas...</div>
+    </div>
+</div>
 
         <div id="screen3" class="screen">
             <h2>Resultado da Escala</h2>

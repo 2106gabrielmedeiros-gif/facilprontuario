@@ -2,6 +2,26 @@
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+    if(typeof positionPreviewToggle === 'function') {
+        positionPreviewToggle();
+    }
+}
+
+function setupTheme() {
+    const toggleButton = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+
+    document.documentElement.setAttribute('data-theme', currentTheme);
+
+    if (toggleButton) {
+        toggleButton.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+        toggleButton.addEventListener('click', () => {
+            let newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            toggleButton.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        });
+    }
 }
 
 // ======== PERSISTÊNCIA ========

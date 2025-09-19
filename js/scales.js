@@ -8,6 +8,18 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCustomData();
     renderScaleSelection();
     loadSessionState();
+    setupTheme();
+
+    const panel = document.getElementById('previewPanel');
+    const btn = document.getElementById('togglePreviewBtn');
+    if (panel && btn) {
+        panel.classList.remove('collapsed');
+        btn.textContent = '»';
+        btn.title = 'Ocultar pré-visualização';
+        btn.addEventListener('click', togglePreviewPanel);
+        positionPreviewToggle();
+        window.addEventListener('resize', positionPreviewToggle);
+    }
 });
 
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
@@ -273,6 +285,47 @@ function selectAnswer(questionId, answerId) {
         answersState[questionId] = { answerId: answerId };
     }
     renderQuestions();
+}
+
+function positionPreviewToggle() {
+  const panel = document.getElementById('previewPanel');
+  const btn = document.getElementById('togglePreviewBtn');
+  if (!panel || !btn) return;
+
+  const rootStyles = getComputedStyle(document.documentElement);
+  const panelWidth = parseInt(rootStyles.getPropertyValue('--panel-width')) || 300;
+  const panelOffset = parseInt(rootStyles.getPropertyValue('--panel-offset-right')) || 20;
+  const screen2IsActive = document.getElementById('screen2').classList.contains('active');
+
+  if (!screen2IsActive) {
+    btn.classList.add('collapse-edge');
+    btn.style.right = `${panelOffset}px`;
+    return;
+  }
+
+  if (panel.classList.contains('collapsed')) {
+    btn.classList.add('collapse-edge');
+    btn.style.right = `${panelOffset}px`;
+  } else {
+    btn.classList.remove('collapse-edge');
+    btn.style.right = `${panelOffset + panelWidth + 8}px`;
+  }
+}
+
+function togglePreviewPanel() {
+  const panel = document.getElementById('previewPanel');
+  const btn = document.getElementById('togglePreviewBtn');
+
+  panel.classList.toggle('collapsed');
+
+  if (panel.classList.contains('collapsed')) {
+    btn.textContent = '«';
+    btn.title = 'Mostrar pré-visualização';
+  } else {
+    btn.textContent = '»';
+    btn.title = 'Ocultar pré-visualização';
+  }
+  positionPreviewToggle();
 }
 
 // ======== LÓGICA DE PONTUAÇÃO E INTERPRETAÇÃO ========
