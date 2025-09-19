@@ -18,7 +18,7 @@
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('prescriptions')">Exportar</button>
-                    <label class="btn btn-secondary btn-small">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])"></label>
+                    <label class="btn btn-secondary btn-small">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
                     <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
                     <button id="theme-toggle" class="theme-toggle-btn">?</button>
                 </div>
@@ -51,7 +51,7 @@
 
         <!-- Screen 2: Prescription Options -->
         <div id="screen2" class="screen">
-            <h2 id="prescriptionTitle">Prescrições...</h2>
+            <h2 id="prescriptionTitle">Prescrições para...</h2>
             <div id="optionsContainer"></div>
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="backToSelection()">Voltar</button>
