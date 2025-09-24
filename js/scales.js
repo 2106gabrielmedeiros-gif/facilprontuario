@@ -107,7 +107,12 @@ function renderScaleSelection() {
     });
 }
 function toggleScaleSelection(scaleId) {
-    selectedScales = [scaleId];
+    const index = selectedScales.indexOf(scaleId);
+    if (index > -1) {
+        selectedScales.splice(index, 1);
+    } else {
+        selectedScales.push(scaleId);
+    }
     renderScaleSelection();
 }
 
@@ -149,7 +154,9 @@ function addNewScale() {
         interpretations: []
     };
 
-    selectedScales = [newId];
+    if (!selectedScales.includes(newId)) {
+        selectedScales.push(newId);
+    }
 
     saveCustomData();
     toggleAddScaleForm();
@@ -181,15 +188,7 @@ function renderQuestions() {
     instructionsContainer.innerHTML = '';
     questionsContainer.innerHTML = '';
 
-    const scaleId = selectedScales[0];
-    const scale = getMergedScales()[scaleId];
-
-    if (scale && scale.instructions) {
-        const instructionsBox = document.createElement('div');
-        instructionsBox.className = 'instructions-box';
-        instructionsBox.innerHTML = `<h4>Instruções</h4><p>${scale.instructions.replace(/\n/g, '<br>')}</p>`;
-        instructionsContainer.appendChild(instructionsBox);
-    }
+    // Não exibe mais instruções de uma única escala, pois várias podem ser selecionadas.
 
     selectedScales.forEach(scaleId => {
         const scale = getMergedScales()[scaleId];
@@ -329,39 +328,30 @@ function togglePreviewPanel() {
 }
 
 // ======== LÓGICA DE PONTUAÇÃO E INTERPRETAÇÃO ========
-function calculateScoreAndInterpret() {
-    if (selectedScales.length === 0) return 'Nenhuma escala selecionada.';
-
-    const scaleId = selectedScales[0];
-    const scale = getMergedScales()[scaleId];
-    if (!scale) return 'Erro: Escala não encontrada.';
+function calculateSingleScaleResult(scale, scaleAnswers) {
+    if (!scale) return 'Erro: Escala inválida.';
 
     const isProgressive = scale.progressive === true;
 
     if (isProgressive) {
         let lastSimQuestionText = "Nenhum critério foi atendido.";
         const questions = scale.questions || [];
-
         for (const question of questions) {
-            const answerState = answersState[question.id];
-
+            const answerState = scaleAnswers[question.id];
             if (answerState) {
                 const answer = question.answers.find(a => a.id === answerState.answerId);
-
                 if (answer && answer.points > 0) {
                     lastSimQuestionText = question.question;
                 }
             }
         }
-
         return `**${scale.name}**\n\n**Nível Atingido:**\n${lastSimQuestionText}`;
-
     } else {
         let totalScore = 0;
-        for (const questionId in answersState) {
-            const question = findQuestionById(questionId);
+        for (const questionId in scaleAnswers) {
+            const question = (scale.questions || []).find(q => q.id === questionId);
             if (question) {
-                const answerId = answersState[questionId].answerId;
+                const answerId = scaleAnswers[questionId].answerId;
                 const answer = question.answers.find(a => a.id === answerId);
                 if (answer) {
                     totalScore += answer.points;
@@ -370,7 +360,7 @@ function calculateScoreAndInterpret() {
         }
 
         let interpretationText = "Faixa de interpretação não definida para esta pontuação.";
-        if (scale.interpretations) {
+        if (scale.interpretations && scale.interpretations.length > 0) {
             for (const rule of scale.interpretations) {
                 if (totalScore >= rule.min && totalScore <= rule.max) {
                     interpretationText = rule.text;
@@ -380,11 +370,36 @@ function calculateScoreAndInterpret() {
         }
 
         if (scale.id === 'pps_1758045265186') {
-            return `**${scale.name}**\n\n**Interpretação:**\n${interpretationText}`;
-        } else {
-            return `**${scale.name}**\n\n**Pontuação Final:** ${totalScore}\n\n**Interpretação:**\n${interpretationText}`;
+             return `**${scale.name}**\n\n**Interpretação:**\n${interpretationText}`;
         }
+        return `**${scale.name}**\n\n**Pontuação Final:** ${totalScore}\n\n**Interpretação:**\n${interpretationText}`;
     }
+}
+
+function calculateScoreAndInterpret() {
+    if (selectedScales.length === 0) return 'Nenhuma escala selecionada.';
+
+    const allScales = getMergedScales();
+    let finalReport = [];
+
+    selectedScales.forEach(scaleId => {
+        const scale = allScales[scaleId];
+        if (scale) {
+            const scaleQuestionIds = new Set((scale.questions || []).map(q => q.id));
+            const scaleAnswers = {};
+            for (const questionId in answersState) {
+                if (scaleQuestionIds.has(questionId)) {
+                    scaleAnswers[questionId] = answersState[questionId];
+                }
+            }
+
+            if (Object.keys(scaleAnswers).length > 0) {
+                 finalReport.push(calculateSingleScaleResult(scale, scaleAnswers));
+            }
+        }
+    });
+
+    return finalReport.join('\n\n<hr>\n\n');
 }
 
 function saveScaleChanges(scaleId) {
