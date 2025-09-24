@@ -89,15 +89,15 @@ body{font-family:'Inter',sans-serif;background-color:var(--cor-fundo);color:var(
 .system-section{margin-bottom:30px;border:1px solid var(--cor-borda);border-radius:12px;overflow:hidden;box-shadow:var(--sombra-suave)}
 .system-header{background-color:var(--cor-cabecalho);color:#fff;padding:15px 20px;font-weight:700;font-size:1.1rem;display:flex;justify-content:space-between;align-items:center}
 .system-actions{display:flex;gap:10px}
-.finding-group{background-color:#fff;padding:15px 20px;border-bottom:1px solid var(--cor-borda)}
+.finding-group{background-color:var(--cor-superficie);padding:15px 20px;border-bottom:1px solid var(--cor-borda)}
 .finding-group:last-child{border-bottom:none}
 .finding-group h4{color:var(--cor-texto-principal);margin-bottom:10px;font-size:1.1rem;display:flex;justify-content:space-between;align-items:center;font-weight:600}
-.finding-item{padding:15px 0;border-bottom:1px solid #f0f0f0}
+.finding-item{padding:15px 0;border-bottom:1px solid var(--cor-borda)}
 .finding-item:last-child{border-bottom:none}
 .finding-question{font-weight:500;font-size:1rem}
 .finding-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .toggle-button{padding:8px 16px;border:1px solid var(--cor-borda);background-color:var(--cor-superficie);border-radius:8px;cursor:pointer;transition:all .2s ease;font-size:.9rem;font-weight:500}
-.toggle-button:hover{border-color:var(--cor-texto-secundario);background-color:#f1f3f5}
+.toggle-button:hover{border-color:var(--cor-texto-secundario);background-color:var(--cor-fundo)}
 .toggle-button.active{background-color:var(--cor-sucesso);border-color:var(--cor-sucesso);color:#000;font-weight:600}
 .button-group{display:flex;gap:15px;margin-top:30px;justify-content:center}
 .btn{padding:12px 30px;border:none;border-radius:8px;font-size:1rem;cursor:pointer;transition:all .2s ease;font-weight:600;letter-spacing:.5px; color: #fff;}
@@ -189,7 +189,7 @@ label.btn {
     height: 28px;
     border-radius: 50%;
     border: 1px solid var(--cor-borda);
-    background-color: #f1f3f5;
+    background-color: var(--cor-fundo);
     color: var(--cor-texto-principal);
     cursor: pointer;
     font-size: 16px;
@@ -201,13 +201,13 @@ label.btn {
     flex-shrink: 0;
 }
 .add-conditional-btn:hover {
-    background-color: #e9ecef;
+    background-color: var(--cor-superficie);
     transform: scale(1.1);
 }
 .finding-item.conditional {
     margin-left: 25px;
     padding-left: 15px;
-    border-left: 3px solid #e9ecef;
+    border-left: 3px solid var(--cor-borda);
 }
 .interpretation-rule{display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:10px;align-items:center;margin-bottom:10px}
 .question-explanation {
@@ -215,10 +215,10 @@ label.btn {
     color: var(--cor-texto-secundario);
     margin-top: 8px;
     padding-left: 10px;
-    border-left: 3px solid #e9ecef;
+    border-left: 3px solid var(--cor-borda);
 }
 .instructions-box {
-    background-color: #f8f9fa;
+    background-color: var(--cor-fundo);
     border-left: 5px solid var(--cor-primaria);
     padding: 15px 20px;
     border-radius: 8px;
@@ -228,6 +228,15 @@ label.btn {
     color: var(--cor-texto-principal);
     margin-top: 0;
     margin-bottom: 10px;
+}
+
+.bordered-section {
+    border-top: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--cor-borda);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 @media (max-width: 768px) {
