@@ -183,12 +183,11 @@ function openEditScaleForm(scaleId) {
 
 // ======== TELA 2: RENDERIZAÇÃO DAS PERGUNTAS ========
 function renderQuestions() {
-    const instructionsContainer = document.getElementById('scaleInstructionsContainer');
     const questionsContainer = document.getElementById('questionsContainer');
-    instructionsContainer.innerHTML = '';
     questionsContainer.innerHTML = '';
-
-    // Não exibe mais instruções de uma única escala, pois várias podem ser selecionadas.
+    // Limpa o container de instruções legado, caso ainda exista.
+    const legacyInstructionsContainer = document.getElementById('scaleInstructionsContainer');
+    if(legacyInstructionsContainer) legacyInstructionsContainer.innerHTML = '';
 
     selectedScales.forEach(scaleId => {
         const scale = getMergedScales()[scaleId];
@@ -197,6 +196,7 @@ function renderQuestions() {
 
         const systemSection = document.createElement('div');
         systemSection.className = 'system-section';
+
         const header = document.createElement('div');
         header.className = 'system-header';
         header.innerHTML = `${scale.name}
@@ -204,6 +204,14 @@ function renderQuestions() {
                 ${isCustomScale ? `<button class="btn btn-success btn-small" onclick="openQuestionModal('${scaleId}')">+ Pergunta</button>` : ''}
             </div>`;
         systemSection.appendChild(header);
+
+        // Adiciona as instruções da escala logo após o cabeçalho
+        if (scale.instructions) {
+            const instructionsBox = document.createElement('div');
+            instructionsBox.className = 'instructions-box';
+            instructionsBox.innerHTML = `<h4>Instruções</h4><p>${scale.instructions.replace(/\n/g, '<br>')}</p>`;
+            systemSection.appendChild(instructionsBox);
+        }
 
         const groupDiv = document.createElement('div');
         groupDiv.className = 'finding-group';
