@@ -209,7 +209,7 @@ function renderQuestions() {
         const groupDiv = document.createElement('div');
         groupDiv.className = 'finding-group';
 
-        (scale.questions || []).sort((a, b) => a.question.localeCompare(b.question)).forEach(question => {
+        (scale.questions || []).forEach(question => {
             const stateObj = answersState[question.id];
             const findingWrapper = document.createElement('div');
             findingWrapper.className = 'finding-item';
