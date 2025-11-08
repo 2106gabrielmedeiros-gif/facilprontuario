@@ -108,11 +108,11 @@ function generateReportText() {
             }
 
             if (categorySentences.length > 0) {
-                 examSectionLines.push(`${category.name}: ${categorySentences.join('. ')}.`);
+                 examSectionLines.push(`**${category.name}:** ${categorySentences.join('. ')}.`);
             }
 
             if (lineFindings.length > 0) {
-                if (positiveSentenceFindings.length === 0 && negativeSentenceFindings.length === 0) examSectionLines.push(`${category.name}:`);
+                if (positiveSentenceFindings.length === 0 && negativeSentenceFindings.length === 0) examSectionLines.push(`**${category.name}:**`);
                 lineFindings.forEach(line => examSectionLines.push(`  ${line}`));
             }
         });
@@ -134,7 +134,11 @@ function generateReport() {
     showScreen('screen3');
 }
 function newExam() { selectedExams = []; findingsState = {}; masterReset(); showScreen('screen1'); renderExamSelection(); }
-function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('resultArea').textContent).then(() => alert('Copiado!')); }
+function copyToClipboard() {
+    let reportText = generateReportText();
+    reportText = reportText.replace(/\*\*/g, '');
+    navigator.clipboard.writeText(reportText).then(() => alert('Copiado!'));
+}
 
 // ======== LÓGICA DE DADOS (MERGE E BUSCA) ========
 function getExamWithAdditions(examId) {
