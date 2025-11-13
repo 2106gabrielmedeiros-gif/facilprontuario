@@ -1,22 +1,10 @@
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
 function showScreen(screenId) {
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(s => {
-        s.style.opacity = '0';
-    });
-
-    setTimeout(() => {
-        screens.forEach(s => s.classList.remove('active'));
-        const newScreen = document.getElementById(screenId);
-        newScreen.classList.add('active');
-        setTimeout(() => {
-            newScreen.style.opacity = '1';
-        }, 50);
-
-        if(typeof positionPreviewToggle === 'function') {
-            positionPreviewToggle();
-        }
-    }, 500);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    if(typeof positionPreviewToggle === 'function') {
+        positionPreviewToggle();
+    }
 }
 
 function setupTheme() {
