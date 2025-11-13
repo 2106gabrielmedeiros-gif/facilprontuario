@@ -1,5 +1,4 @@
 // ======== ESTADO DA APLICAÇÃO ========
-let editMode = false;
 let selectedExams = [];
 let findingsState = {};
 let customExams = {};
@@ -25,12 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
-function proceedToExam(isEditMode) {
+function proceedToExam() {
     if (selectedExams.length === 0) {
         alert('Selecione pelo menos um exame.');
         return;
     }
-    editMode = isEditMode;
     renderFindings();
     showScreen('screen2');
 }
@@ -207,24 +205,13 @@ function renderFindings() {
         systemSection.className = 'system-section';
         const header = document.createElement('div');
         header.className = 'system-header';
-
-        let headerActions = '';
-        if (editMode) {
-            headerActions = `<div class="system-actions">${isCustomExam ? `<button class="btn btn-secondary btn-small" onclick="addCategory('${examId}')">+ Seção</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}')">+ Achado</button></div>`;
-        }
-        header.innerHTML = `${exam.name}${headerActions}`;
+        header.innerHTML = `${exam.name}<div class="system-actions">${isCustomExam ? `<button class="btn btn-secondary btn-small" onclick="addCategory('${examId}')">+ Seção</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}')">+ Achado</button></div>`;
         systemSection.appendChild(header);
-
         Object.entries(exam.findings).forEach(([categoryKey, category]) => {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'finding-group';
             const groupTitle = document.createElement('h4');
-
-            let categoryActions = '';
-            if (editMode) {
-                categoryActions = `<div class="category-actions">${isCustomExam ? `<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button><button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}','${categoryKey}')">+</button></div>`;
-            }
-            groupTitle.innerHTML = `<span>${category.name}</span>${categoryActions}`;
+            groupTitle.innerHTML = `<span>${category.name}</span><div class="category-actions">${isCustomExam ? `<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button><button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}','${categoryKey}')">+</button></div>`;
             groupDiv.appendChild(groupTitle);
 
             const originalItems = category.items || [];
@@ -265,7 +252,6 @@ function renderFindings() {
                     input.style.maxWidth = '200px';
                     input.value = findingsState[finding.id]?.value || '';
                     input.oninput = (e) => saveOpenTextAnswer(finding.id, e.target.value);
-                    input.disabled = !editMode;
                     controlsDiv.appendChild(input);
                 } else {
                     (finding.answers || []).forEach(answer => {
@@ -279,24 +265,23 @@ function renderFindings() {
                             btn.classList.add('active');
                         }
                         btn.onclick = () => selectAnswer(finding.id, answer.id);
-                        wrapper.appendChild(btn);
 
-                        if (editMode) {
-                            const addBtn = document.createElement('button');
-                            addBtn.className = 'add-conditional-btn';
-                            addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
-                            addBtn.innerHTML = '+';
-                            addBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                openConditionalFindingModal(exam.id, categoryKey, finding.id, answer.id);
-                            };
-                            wrapper.appendChild(addBtn);
-                        }
+                        const addBtn = document.createElement('button');
+                        addBtn.className = 'add-conditional-btn';
+                        addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
+                        addBtn.innerHTML = '+';
+                        addBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            openConditionalFindingModal(exam.id, categoryKey, finding.id, answer.id);
+                        };
+
+                        wrapper.appendChild(btn);
+                        wrapper.appendChild(addBtn);
                         controlsDiv.appendChild(wrapper);
                     });
                 }
 
-                if (editMode && finding.id.startsWith('custom_')) {
+                if (finding.id.startsWith('custom_')) {
                     const editBtn = document.createElement('button');
                     editBtn.className = 'icon-btn edit'; editBtn.innerHTML = '✎'; editBtn.title = 'Editar achado';
                     editBtn.onclick = () => openEditFindingModal(exam.id, categoryKey, finding.id);
@@ -313,7 +298,6 @@ function renderFindings() {
                     detailInput.placeholder = 'Adicionar detalhes (opcional)...';
                     detailInput.value = stateObj?.detail || '';
                     detailInput.oninput = (e) => saveFindingDetail(e, finding.id);
-                    detailInput.disabled = !editMode;
                     detailContainer.appendChild(detailInput);
                 }
 
@@ -633,18 +617,7 @@ function updatePreview() { document.getElementById('previewContent').textContent
 
 // ======== EXAMES E CATEGORIAS CUSTOMIZADOS ========
 function toggleAddExamForm() { document.getElementById('addExamForm').classList.toggle('hidden'); }
-function addNewExam() {
-    const name = document.getElementById('newExamName').value.trim();
-    const desc = document.getElementById('newExamDescription').value.trim();
-    if (!name || !desc) return;
-    const id = 'custom_' + Date.now();
-    customExams[id] = { id, name, description: desc, findings: { personalizado: { name: "Personalizado", items: [] } } };
-    saveCustomData();
-    toggleAddExamForm();
-    selectedExams.push(id);
-    renderExamSelection();
-    proceedToExam(true);
-}
+function addNewExam() { const name = document.getElementById('newExamName').value.trim(); const desc = document.getElementById('newExamDescription').value.trim(); if (!name || !desc) return; const id = 'custom_' + Date.now(); customExams[id] = { id, name, description: desc, findings: { personalizado: { name: "Personalizado", items: [] } } }; saveCustomData(); toggleAddExamForm(); renderExamSelection(); }
 function deleteExam(examId) { if(confirm('Deletar este exame e todos os seus achados?')){ delete customExams[examId]; selectedExams = selectedExams.filter(id => id !== examId); saveCustomData(); renderExamSelection(); }}
 function addCategory(examId) { const name = prompt("Nome da nova seção:"); if (name) { const catKey = 'cat_' + Date.now(); customExams[examId].findings[catKey] = { name, items: [] }; saveCustomData(); renderFindings(); }}
 function editCategoryName(examId, catKey) { const newName = prompt("Novo nome:", customExams[examId].findings[catKey].name); if (newName) { customExams[examId].findings[catKey].name = newName; saveCustomData(); renderFindings(); }}
