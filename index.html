@@ -31,8 +31,9 @@
             <div class="form-group" style="margin-bottom:20px"><input type="text" id="examSearchInput" onkeyup="renderExamSelection()" placeholder="Buscar exame por nome..."></div>
             <div class="exam-grid" id="examGrid"></div>
             <div class="button-group">
-                <button class="btn btn-primary" onclick="proceedToExam()">Prosseguir</button>
+                <button class="btn btn-primary" onclick="proceedToExam(false)">Prosseguir</button>
                 <button class="btn btn-secondary" onclick="toggleAddExamForm()">Adicionar Novo Exame</button>
+                <button class="icon-btn edit" onclick="proceedToExam(true)" title="Modo de Edição">✎</button>
             </div>
             <div id="addExamForm" class="add-exam-form hidden">
                 <h3 id="examFormTitle">Adicionar Novo Exame</h3>
