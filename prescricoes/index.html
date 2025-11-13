@@ -4,80 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil - Prescrições Médicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/tailwind.css">
+    <script src="../tailwind.config.js"></script>
+    <link rel="stylesheet" href="../css/animations.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-    <div class="container">
+<body class="bg-bright-yellow text-dark font-mono">
+    <div class="container mx-auto p-4">
         <!-- Header -->
-        <div class="header">
-            <h1>Prontuário Fácil - Prescrições</h1>
-            <p>Crie e gerencie seus modelos de prescrição.</p>
-            <div class="header-actions">
-                <div class="left-actions">
-                    <button class="btn btn-primary btn-small" onclick="location.href='../index.html'">Voltar</button>
+        <div class="header bg-electric-blue p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000]">
+            <h1 class="text-4xl font-bold">Prontuário Fácil - Prescrições</h1>
+            <p class="text-lg">Crie e gerencie seus modelos de prescrição.</p>
+            <div class="header-actions mt-4 flex flex-wrap justify-between items-center">
+                <div class="left-actions flex gap-2 flex-wrap">
+                    <button class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="location.href='../index.html'">Voltar</button>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('prescriptions')">Exportar</button>
-                    <label class="btn btn-secondary btn-small">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
-                    <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
-                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <button id="export-button" class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="exportData('prescriptions')">Exportar</button>
+                    <label class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
+                    <button class="bg-red-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="masterReset()">Reset Total</button>
+                    <button id="theme-toggle" class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark">?</button>
                 </div>
             </div>
         </div>
 
         <!-- Screen 1: Disease Selection -->
-        <div id="screen1" class="screen active">
-            <h2>Selecione a Doença</h2>
-            <div class="form-group" style="margin-bottom:20px">
-                <input type="text" id="diseaseSearchInput" onkeyup="renderDiseaseSelection()" placeholder="Buscar por nome...">
+        <div id="screen1" class="screen active bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] mt-8">
+            <h2 class="text-2xl font-bold mb-4">Selecione a Doença</h2>
+            <div class="form-group mb-4">
+                <input type="text" id="diseaseSearchInput" onkeyup="renderDiseaseSelection()" placeholder="Buscar por nome..." class="w-full p-2 border-2 border-dark rounded-lg">
             </div>
-            <div class="exam-grid" id="diseaseGrid"></div>
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="toggleAddDiseaseForm()">Adicionar Nova Doença</button>
+            <div class="exam-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="diseaseGrid"></div>
+            <div class="button-group mt-4 flex gap-2">
+                <button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="toggleAddDiseaseForm()">Adicionar Nova Doença</button>
             </div>
             <!-- Add Disease Form -->
-            <div id="addDiseaseForm" class="add-exam-form hidden">
-                <h3 id="diseaseFormTitle">Adicionar Nova Doença</h3>
-                <div class="form-group">
-                    <label for="newDiseaseName">Nome da Doença:</label>
-                    <input type="text" id="newDiseaseName">
+            <div id="addDiseaseForm" class="add-exam-form hidden mt-4 p-4 border-2 border-dark rounded-lg">
+                <h3 id="diseaseFormTitle" class="text-xl font-bold mb-4">Adicionar Nova Doença</h3>
+                <div class="form-group mb-4">
+                    <label for="newDiseaseName" class="block">Nome da Doença:</label>
+                    <input type="text" id="newDiseaseName" class="w-full p-2 border-2 border-dark rounded-lg">
                 </div>
-                <div class="button-group">
-                    <button id="saveDiseaseBtn" class="btn btn-success" onclick="addNewDisease()">Adicionar</button>
-                    <button class="btn btn-secondary" onclick="toggleAddDiseaseForm()">Cancelar</button>
+                <div class="button-group flex gap-2">
+                    <button id="saveDiseaseBtn" class="bg-green-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="addNewDisease()">Adicionar</button>
+                    <button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="toggleAddDiseaseForm()">Cancelar</button>
                 </div>
             </div>
         </div>
 
         <!-- Screen 2: Prescription Options -->
-        <div id="screen2" class="screen">
-            <h2 id="prescriptionTitle">Prescrições para...</h2>
+        <div id="screen2" class="screen bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] mt-8">
+            <h2 id="prescriptionTitle" class="text-2xl font-bold mb-4">Prescrições para...</h2>
             <div id="optionsContainer"></div>
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="backToSelection()">Voltar</button>
-                <button class="btn btn-primary" onclick="toggleAddOptionForm()">Adicionar Nova Opção</button>
+            <div class="button-group mt-4 flex gap-2">
+                <button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="backToSelection()">Voltar</button>
+                <button class="bg-electric-blue text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="toggleAddOptionForm()">Adicionar Nova Opção</button>
             </div>
         </div>
     </div>
 
     <!-- Add/Edit Option Modal -->
-    <div id="optionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="optionModalTitle">Adicionar/Editar Opção</h3>
-                <span class="close" onclick="closeOptionModal()">&times;</span>
+    <div id="optionModal" class="modal fixed inset-0 bg-dark bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] w-11/12 md:w-1/2">
+            <div class="modal-header flex justify-between items-center mb-4">
+                <h3 id="optionModalTitle" class="text-2xl font-bold">Adicionar/Editar Opção</h3>
+                <span class="close text-2xl font-bold cursor-pointer" onclick="closeOptionModal()">&times;</span>
             </div>
-            <div class="form-group">
-                <label for="optionName">Nome da Opção (ex: Tratamento Oral):</label>
-                <input type="text" id="optionName">
+            <div class="form-group mb-4">
+                <label for="optionName" class="block mb-2">Nome da Opção (ex: Tratamento Oral):</label>
+                <input type="text" id="optionName" class="w-full p-2 border-2 border-dark rounded-lg">
             </div>
-            <div class="form-group">
-                <label for="optionText">Texto da Prescrição:</label>
-                <textarea id="optionText" rows="10"></textarea>
+            <div class="form-group mb-4">
+                <label for="optionText" class="block mb-2">Texto da Prescrição:</label>
+                <textarea id="optionText" rows="10" class="w-full p-2 border-2 border-dark rounded-lg"></textarea>
             </div>
-            <div class="button-group">
-                <button id="saveOptionBtn" class="btn btn-success">Salvar</button>
-                <button class="btn btn-secondary" onclick="closeOptionModal()">Cancelar</button>
+            <div class="button-group flex gap-2">
+                <button id="saveOptionBtn" class="bg-green-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light">Salvar</button>
+                <button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="closeOptionModal()">Cancelar</button>
             </div>
         </div>
     </div>

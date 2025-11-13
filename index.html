@@ -4,125 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/tailwind.css">
+    <script src="tailwind.config.js"></script>
+    <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Prontuário Fácil</h1>
-            <p>Versão 0.1</p>
-           <div class="header-actions">
-                <div class="left-actions">
-                    <button class="btn btn-primary btn-small" onclick="location.href='escalas/index.html'">Escalas</button>
-                    <button class="btn btn-primary btn-small" onclick="location.href='prescricoes/index.html'">Prescrições</button>
-                    <button class="btn btn-primary btn-small" onclick="openHelpModal()">Ajuda</button>
+<body class="bg-bright-yellow text-dark font-mono">
+    <div class="container mx-auto p-4">
+        <div class="header bg-electric-blue p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000]">
+            <h1 class="text-4xl font-bold">Prontuário Fácil</h1>
+            <p class="text-lg">Versão 0.1</p>
+           <div class="header-actions mt-4 flex flex-wrap justify-between items-center">
+                <div class="left-actions flex gap-2 flex-wrap">
+                    <button class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="location.href='escalas/index.html'">Escalas</button>
+                    <button class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="location.href='prescricoes/index.html'">Prescrições</button>
+                    <button class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="openHelpModal()">Ajuda</button>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('exams')">Exportar</button>
-                    <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
-                    <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
-                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <button id="export-button" class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="exportData('exams')">Exportar</button>
+                    <label class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
+                    <button class="bg-red-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark" onclick="masterReset()">Reset Total</button>
+                    <button id="theme-toggle" class="bg-dark text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-light hover:text-dark">?</button>
                 </div>
             </div>
         </div>
 
-        <div id="screen1" class="screen active">
-            <h2>Selecione os Exames</h2>
-            <div class="form-group" style="margin-bottom:20px"><input type="text" id="examSearchInput" onkeyup="renderExamSelection()" placeholder="Buscar exame por nome..."></div>
-            <div class="exam-grid" id="examGrid"></div>
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="proceedToExam()">Prosseguir</button>
-                <button class="btn btn-secondary" onclick="toggleAddExamForm()">Adicionar Novo Exame</button>
+        <div id="screen1" class="screen active bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] mt-8">
+            <h2 class="text-2xl font-bold mb-4">Selecione os Exames</h2>
+            <div class="form-group mb-4">
+                <input type="text" id="examSearchInput" onkeyup="renderExamSelection()" placeholder="Buscar exame por nome..." class="w-full p-2 border-2 border-dark rounded-lg">
             </div>
-            <div id="addExamForm" class="add-exam-form hidden">
-                <h3 id="examFormTitle">Adicionar Novo Exame</h3>
-                <div class="form-group"><label for="newExamName">Nome:</label><input type="text" id="newExamName"></div>
-                <div class="form-group"><label for="newExamDescription">Descrição:</label><input type="text" id="newExamDescription"></div>
-                <div class="button-group"><button id="saveExamBtn" class="btn btn-success" onclick="addNewExam()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddExamForm()">Cancelar</button></div>
+            <div class="exam-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="examGrid"></div>
+            <div class="button-group mt-4 flex gap-2">
+                <button class="bg-electric-blue text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="proceedToExam()">Prosseguir</button>
+                <button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="toggleAddExamForm()">Adicionar Novo Exame</button>
+            </div>
+            <div id="addExamForm" class="add-exam-form hidden mt-4 p-4 border-2 border-dark rounded-lg">
+                <h3 id="examFormTitle" class="text-xl font-bold mb-4">Adicionar Novo Exame</h3>
+                <div class="form-group mb-2"><label for="newExamName" class="block">Nome:</label><input type="text" id="newExamName" class="w-full p-2 border-2 border-dark rounded-lg"></div>
+                <div class="form-group mb-4"><label for="newExamDescription" class="block">Descrição:</label><input type="text" id="newExamDescription" class="w-full p-2 border-2 border-dark rounded-lg"></div>
+                <div class="button-group flex gap-2"><button id="saveExamBtn" class="bg-green-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="addNewExam()">Adicionar</button><button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="toggleAddExamForm()">Cancelar</button></div>
             </div>
         </div>
 
-        <div id="screen2" class="screen">
-            <h2>Registre os Achados</h2>
+        <div id="screen2" class="screen bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] mt-8">
+            <h2 class="text-2xl font-bold mb-4">Registre os Achados</h2>
             <div id="findingsContainer"></div>
-            <div class="button-group"><button class="btn btn-secondary" onclick="backToSelection()">Voltar</button><button class="btn btn-primary" onclick="generateReport()">Gerar Laudo</button></div>
-            <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
-            <div id="previewPanel" class="preview-panel">
-                <h3>Pré-visualização</h3>
+            <div class="button-group mt-4 flex gap-2"><button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="backToSelection()">Voltar</button><button class="bg-electric-blue text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="generateReport()">Gerar Laudo</button></div>
+            <button id="togglePreviewBtn" class="toggle-preview-btn fixed top-1/2 right-0 bg-dark text-light p-2 rounded-l-lg md:hidden">»</button>
+            <div id="previewPanel" class="preview-panel fixed top-0 right-0 h-full bg-light border-l-4 border-dark p-4 w-full md:w-1/3">
+                <h3 class="text-xl font-bold mb-4">Pré-visualização</h3>
                 <div id="previewContent">Selecione os achados...</div>
             </div>
         </div>
 
-        <div id="screen3" class="screen">
-            <h2>Descrição do Exame Físico</h2>
-            <div id="resultArea" class="result-area"></div>
-            <div class="button-group"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="newExam()">Novo Exame</button></div>
+        <div id="screen3" class="screen bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] mt-8">
+            <h2 class="text-2xl font-bold mb-4">Descrição do Exame Físico</h2>
+            <div id="resultArea" class="result-area bg-white p-4 border-2 border-dark rounded-lg"></div>
+            <div class="button-group mt-4 flex gap-2"><button class="bg-green-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="copyToClipboard()">Copiar</button><button class="bg-electric-blue text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="newExam()">Novo Exame</button></div>
         </div>
     </div>
 
-    <div id="findingModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="findingModalTitle">Adicionar/Editar Achado</h3><span class="close" onclick="closeFindingModal()">&times;</span></div>
+    <div id="findingModal" class="modal fixed inset-0 bg-dark bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] w-11/12 md:w-1/2">
+            <div class="modal-header flex justify-between items-center mb-4"><h3 id="findingModalTitle" class="text-2xl font-bold">Adicionar/Editar Achado</h3><span class="close text-2xl font-bold cursor-pointer" onclick="closeFindingModal()">&times;</span></div>
             
-            <div class="form-group">
-                <label for="findingType">Tipo de Pergunta:</label>
-                <select id="findingType" onchange="updateFindingModalUI()">
+            <div class="form-group mb-4">
+                <label for="findingType" class="block mb-2">Tipo de Pergunta:</label>
+                <select id="findingType" onchange="updateFindingModalUI()" class="w-full p-2 border-2 border-dark rounded-lg">
                     <option value="multiple-choice">Múltipla Escolha / Sim-Não</option>
                     <option value="open-text">Texto Aberto (ex: Sinais Vitais)</option>
                 </select>
             </div>
 
-            <div class="form-group"><label for="findingQuestion">Pergunta:</label><input type="text" id="findingQuestion" placeholder="Ex: Bulhas cardíacas? ou Frequência Cardíaca"></div>
+            <div class="form-group mb-4"><label for="findingQuestion" class="block mb-2">Pergunta:</label><input type="text" id="findingQuestion" placeholder="Ex: Bulhas cardíacas? ou Frequência Cardíaca" class="w-full p-2 border-2 border-dark rounded-lg"></div>
             
-            <div class="form-group bordered-section">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="checkbox" id="conditionalCheckbox" onclick="toggleConditionalUI()">
-                    <strong>Exibição Condicional</strong>
+            <div class="form-group bordered-section border-2 border-dark rounded-lg p-4 mb-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="conditionalCheckbox" onclick="toggleConditionalUI()" class="w-6 h-6 border-2 border-dark">
+                    <strong class="text-lg">Exibição Condicional</strong>
                 </label>
-                <div id="conditionalControls" class="hidden" style="margin-top: 10px; padding-left: 20px;">
-                    <p style="font-size: 0.9em; color: #6c757d;">Exibir este achado somente se:</p>
-                    <div class="form-group">
-                        <label for="triggerFindingSelect">A resposta para o achado...</label>
-                        <select id="triggerFindingSelect" class="form-control" style="width:100%; padding:8px;"></select>
+                <div id="conditionalControls" class="hidden mt-4 pl-8">
+                    <p class="text-sm text-gray-600 mb-2">Exibir este achado somente se:</p>
+                    <div class="form-group mb-2">
+                        <label for="triggerFindingSelect" class="block mb-1">A resposta para o achado...</label>
+                        <select id="triggerFindingSelect" class="w-full p-2 border-2 border-dark rounded-lg"></select>
                     </div>
                     <div class="form-group">
-                        <label for="triggerAnswerSelect">...for igual a...</label>
-                        <select id="triggerAnswerSelect" class="form-control" style="width:100%; padding:8px;"></select>
+                        <label for="triggerAnswerSelect" class="block mb-1">...for igual a...</label>
+                        <select id="triggerAnswerSelect" class="w-full p-2 border-2 border-dark rounded-lg"></select>
                     </div>
                 </div>
             </div>
-            <div id="reportLabelGroup" class="form-group hidden">
-                <label for="findingReportLabel">Etiqueta para o Laudo (ex: FC):</label>
-                <input type="text" id="findingReportLabel" placeholder="Ex: FC, PA, FR, SpO2">
+            <div id="reportLabelGroup" class="form-group hidden mb-4">
+                <label for="findingReportLabel" class="block mb-2">Etiqueta para o Laudo (ex: FC):</label>
+                <input type="text" id="findingReportLabel" placeholder="Ex: FC, PA, FR, SpO2" class="w-full p-2 border-2 border-dark rounded-lg">
             </div>
 
-            <div id="answersGroup">
+            <div id="answersGroup" class="mb-4">
                 <div class="form-group">
-                    <label>Respostas Possíveis:</label>
+                    <label class="block mb-2">Respostas Possíveis:</label>
                     <div id="answersContainer"></div>
-                    <button class="btn btn-secondary btn-small" onclick="addAnswerField()" style="margin-top:10px">+ Adicionar Resposta</button>
+                    <button class="bg-light text-dark font-bold py-1 px-2 border-2 border-dark rounded-lg hover:bg-dark hover:text-light mt-2" onclick="addAnswerField()">+ Adicionar Resposta</button>
                 </div>
             </div>
 
-            <div class="form-group"><label for="findingInfo">Texto de Informação (Opcional):</label><textarea id="findingInfo" rows="4" placeholder="Explique o que é este achado..."></textarea></div>
-            <div class="button-group"><button id="saveFindingBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeFindingModal()">Cancelar</button></div>
+            <div class="form-group mb-4"><label for="findingInfo" class="block mb-2">Texto de Informação (Opcional):</label><textarea id="findingInfo" rows="4" placeholder="Explique o que é este achado..." class="w-full p-2 border-2 border-dark rounded-lg"></textarea></div>
+            <div class="button-group flex gap-2"><button id="saveFindingBtn" class="bg-green-500 text-light font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light">Salvar</button><button class="bg-light text-dark font-bold py-2 px-4 border-2 border-dark rounded-lg hover:bg-dark hover:text-light" onclick="closeFindingModal()">Cancelar</button></div>
         </div>
     </div>
 
-    <div id="infoModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Informações sobre o Achado</h3><span class="close" onclick="closeInfoModal()">&times;</span></div>
-            <div id="infoModalContent" style="white-space:pre-wrap;line-height:1.7"></div>
+    <div id="infoModal" class="modal fixed inset-0 bg-dark bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] w-11/12 md:w-1/2">
+            <div class="modal-header flex justify-between items-center mb-4"><h3 class="text-2xl font-bold">Informações sobre o Achado</h3><span class="close text-2xl font-bold cursor-pointer" onclick="closeInfoModal()">&times;</span></div>
+            <div id="infoModalContent" class="text-lg leading-relaxed"></div>
         </div>
     </div>
 
-    <div id="helpModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Como Usar o Prontuário Fácil</h3>
-                <span class="close" onclick="closeHelpModal()">&times;</span>
+    <div id="helpModal" class="modal fixed inset-0 bg-dark bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content bg-light p-4 border-4 border-dark rounded-lg shadow-[8px_8px_0_0_#000] w-11/12 md:w-2/3">
+            <div class="modal-header flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold">Como Usar o Prontuário Fácil</h3>
+                <span class="close text-2xl font-bold cursor-pointer" onclick="closeHelpModal()">&times;</span>
             </div>
-            <div id="helpModalContent" style="line-height:1.7">
+            <div id="helpModalContent" class="text-lg leading-relaxed">
                 <h4>Passo 1: Selecione os Exames</h4>
                 <p>Na tela inicial, clique nos roteiros de examinação que deseja incluir na sua consulta. Os exames selecionados ficarão destacados. Você pode adicionar seus próprios exames customizados clicando em "Adicionar Novo Exame" (não recomendamos).</p>
                 
