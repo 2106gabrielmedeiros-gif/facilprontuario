@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Prontuário Fácil</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { text-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 25px rgba(45, 212, 191, 0.6); }
+            100% { text-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+        }
+        
+        @keyframes subtleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Classes utilitárias para a animação com delay */
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0; /* Começa invisível */
+        }
+        
+        .animate-glow-pulse {
+            animation: glowPulse 2s infinite ease-in-out;
+        }
+        
+        .animate-subtle-bounce {
+            animation: subtleBounce 2s infinite ease-in-out;
+        }
+        
+        /* Delays para escalonar a entrada dos elementos reduzidos para carregamento mais rápido */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        
+        /* Background particles for a starry effect */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.2; }
+        }
+
+        /* Garantir visibilidade imediata se animações falharem */
+        body.loaded .animate-fade-in-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-indigo-900 to-blue-900 text-white min-h-screen flex flex-col items-center justify-center font-sans p-4 relative overflow-hidden" onload="document.body.classList.add('loaded');">
+
+    <!-- Starry background for cosmic feel -->
+    <div class="stars">
+        <script>
+            // Generate random stars
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = `${Math.random() * 2 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                starsContainer.appendChild(star);
+            }
+        </script>
+    </div>
+
+    <div class="w-full max-w-3xl bg-gradient-to-br from-black/50 to-blue-900/30 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-12 text-center overflow-hidden border border-blue-500/20 transform hover:scale-105 transition-transform duration-500 ease-in-out">
+        
+        <div class="content relative z-10">
+            
+            <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-cyan-200 animate-fade-in-up animate-glow-pulse">
+                Prontuário Fácil
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-200 mt-4 animate-fade-in-up delay-1">
+                Sua ferramenta open-source para agilizar a criação de laudos e prescrições médicas.
+            </p>
+            
+            <p class="text-md md:text-lg text-gray-300 mt-6 leading-relaxed max-w-xl mx-auto animate-fade-in-up delay-2">
+                O Prontuário Fácil foi projetado para simplificar o dia a dia de profissionais de saúde. Com ele, você pode gerar laudos de exames físicos, aplicar escalas clínicas e criar prescrições de forma rápida e intuitiva, tudo em um só lugar.
+            </p>
+            
+            <button class="mt-10 px-10 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-teal-600 hover:scale-110 transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 animate-fade-in-up delay-3 animate-subtle-bounce" onclick="location.href='index.html'">
+                Começar a Usar
+            </button>
+        </div>
+    </div>
+
+    <footer class="mt-8 text-gray-400 text-sm animate-fade-in-up delay-4">
+        <p>Versão 0.1 | Projeto Open-Source</p>
+    </footer>
+
+</body>
+</html>

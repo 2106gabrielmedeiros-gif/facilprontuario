@@ -239,7 +239,23 @@ function renderFindings() {
 
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'finding-question';
-                questionDiv.textContent = finding.question;
+
+                const questionLabel = document.createElement('span');
+                questionLabel.textContent = finding.question;
+                questionDiv.appendChild(questionLabel);
+
+                if (finding.info) {
+                    const infoBtn = document.createElement('button');
+                    infoBtn.type = 'button';
+                    infoBtn.className = 'info-inline-btn';
+                    infoBtn.setAttribute('aria-label', `Ver instruções para ${finding.question}`);
+                    infoBtn.textContent = 'ⓘ';
+                    infoBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        showInfoModal(finding.id);
+                    };
+                    questionDiv.appendChild(infoBtn);
+                }
 
                 const controlsDiv = document.createElement('div');
                 controlsDiv.className = 'finding-controls';
@@ -292,26 +308,27 @@ function renderFindings() {
                 detailContainer.className = 'finding-detail-container';
 
                 if (finding.type !== 'open-text') {
+                    const detailInputId = `detail-${finding.id}`;
+                    const detailLabel = document.createElement('label');
+                    detailLabel.className = 'detail-label';
+                    detailLabel.setAttribute('for', detailInputId);
+                    detailLabel.textContent = 'Detalhes adicionais';
+
                     const detailInput = document.createElement('input');
                     detailInput.type = 'text';
+                    detailInput.id = detailInputId;
                     detailInput.className = 'finding-detail-input';
-                    detailInput.placeholder = 'Adicionar detalhes (opcional)...';
+                    detailInput.placeholder = 'Adicionar detalhes (opcional)';
                     detailInput.value = stateObj?.detail || '';
                     detailInput.oninput = (e) => saveFindingDetail(e, finding.id);
+
+                    detailContainer.appendChild(detailLabel);
                     detailContainer.appendChild(detailInput);
-                }
-
-                const actionsContainer = document.createElement('div');
-                actionsContainer.className = 'finding-actions-container';
-
-                if (finding.info) {
-                    actionsContainer.innerHTML += `<button class="action-btn info-btn" onclick="showInfoModal('${finding.id}')">ⓘ Informações</button>`;
                 }
 
                 findingWrapper.appendChild(questionDiv);
                 findingWrapper.appendChild(controlsDiv);
                 findingWrapper.appendChild(detailContainer);
-                findingWrapper.appendChild(actionsContainer);
                 groupDiv.appendChild(findingWrapper);
             });
             systemSection.appendChild(groupDiv);
@@ -447,7 +464,7 @@ function openFindingModal(examId, categoryKey = null, condition = null) {
     }
 
     updateFindingModalUI();
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 function openEditExamForm(examId) {
@@ -472,7 +489,7 @@ function openEditFindingModal(examId, categoryKey, findingId) {
     (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description, ans.isNegative));
     document.getElementById('findingModalTitle').textContent = 'Editar Achado';
     document.getElementById('saveFindingBtn').onclick = () => saveFindingChanges(currentFinding);
-    document.getElementById('findingModal').style.display = 'block';
+    document.getElementById('findingModal').style.display = 'flex';
 }
 
 function closeFindingModal() {
@@ -598,13 +615,13 @@ function showInfoModal(findingId) {
     const infoText = finding?.info;
     if (!infoText || !infoText.trim()) { alert("Nenhuma informação adicional disponível."); return; }
     document.getElementById('infoModalContent').innerHTML = infoText;
-    document.getElementById('infoModal').style.display = 'block';
+    document.getElementById('infoModal').style.display = 'flex';
 }
 
 function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
 function openHelpModal() {
-    document.getElementById('helpModal').style.display = 'block';
+    document.getElementById('helpModal').style.display = 'flex';
 }
 
 function closeHelpModal() {

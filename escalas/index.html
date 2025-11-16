@@ -1,136 +1,182 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil - Escalas Médicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Prontuário Fácil - Escalas Médicas</h1>
-            <p>Aplique escalas com cálculo automático de pontuação.</p>
-           <div class="header-actions">
-                <div class="left-actions">
-                    <button class="btn btn-primary btn-small" onclick="location.href='../index.html'">Voltar</button>
-                    <button class="btn btn-primary btn-small" onclick="location.href='../prescricoes/index.html'">Acessar Prescrições</button>
+<body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
+    <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+            <a href="../index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
+            <div class="hidden md:flex items-center gap-2 text-sm font-semibold">
+                <a href="../index.html" class="nav-link text-slate-100/80">Home</a>
+                <a href="../exames.html" class="nav-link text-slate-100/80">Exames</a>
+                <a href="index.html" class="nav-link text-white">Escalas</a>
+                <a href="../prescricoes/index.html" class="nav-link text-slate-100/80">Prescrições</a>
+                <a href="#" onclick="openHelpModal()" class="nav-link text-slate-100/80">Ajuda</a>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 bg-white/5 rounded-2xl px-3 py-2 border border-white/10">
+                <button id="export-button" class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition" onclick="exportData('scales')">Exportar</button>
+                <label class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition cursor-pointer">
+                    Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
+                </label>
+                <button class="px-4 py-2 text-sm font-semibold rounded-xl bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
+            </div>
+        </div>
+    </nav>
+    <header class="page-hero px-6">
+        <span class="page-hero__badge">Escalas clínicas</span>
+        <h1>Calcule escores e interpretações oficiais sem sair do navegador.</h1>
+        <p>Escolha escalas validadas, aplique-as com segurança, salve respostas e exporte configurações para toda a equipe.</p>
+        <div class="hero-actions">
+            <button class="btn btn-primary" onclick="document.getElementById('screen1').scrollIntoView({behavior:'smooth'});">Selecionar escalas</button>
+            <div class="meta">
+                <span>Interpretação automática</span>
+                <span>Offline-ready</span>
+            </div>
+        </div>
+    </header>
+    <div class="page-shell">
+            
+                <div id="screen1" class="screen active container mx-auto max-w-6xl px-6 py-12">
+                    <div class="glass-panel p-6 md:p-10">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="md:col-span-1">
+                                <div class="glass-panel p-6 h-full">
+                                <h2 class="text-2xl font-bold mb-2">Escalas Médicas</h2>
+                                <p class="text-slate-300 mb-4">Aplique escalas com cálculo automático de pontuação.</p>
+                                <input type="text" id="scaleSearchInput" onkeyup="renderScaleSelection()" placeholder="Buscar escala por nome..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                </div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <div class="exam-grid" id="scaleGrid"></div>
+                                <div class="button-group mt-6">
+                                    <button class="btn btn-primary" onclick="proceedToScale()">Prosseguir</button>
+                                    <button class="btn btn-secondary" onclick="toggleAddScaleForm()">Adicionar Nova Escala</button>
+                                </div>
+                                <div id="addScaleForm" class="add-exam-form hidden mt-6 glass-panel p-6">
+                                <div class="form-group" style="display: flex; align-items: center; gap: 10px; justify-content: start;">
+                                    <input type="checkbox" id="newScaleProgressive" style="width: auto; height: auto;">
+                                    <label for="newScaleProgressive" style="margin-bottom: 0; font-weight: normal;">Esta é uma escala progressiva (lógica do "último sim", tipo PPS)</label>
+                                </div>
+                                <h3 id="scaleFormTitle" class="text-xl font-bold mb-4">Adicionar Nova Escala</h3>
+                                <div class="space-y-4">
+                                    <div class="form-group"><label for="newScaleName" class="block mb-1">Nome da Escala:</label><input type="text" id="newScaleName" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
+                                    <div class="form-group"><label for="newScaleDescription" class="block mb-1">Descrição Curta:</label><input type="text" id="newScaleDescription" placeholder="Um resumo breve da escala..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
+                                    <div class="form-group"><label for="newScaleInstructions" class="block mb-1">Instruções de Preenchimento:</label><textarea id="newScaleInstructions" rows="5" placeholder="Insira aqui as instruções detalhadas..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea></div>
+                                    <div class="button-group"><button id="saveScaleBtn" class="btn btn-success" onclick="addNewScale()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddScaleForm()">Cancelar</button></div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('scales')">Exportar</button>
-                    <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
-                    <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
-                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
+            
+                <div id="screen2" class="screen container mx-auto max-w-6xl px-6 py-12">
+                    <div class="glass-panel p-6 md:p-10">
+                        <h2 class="text-2xl font-bold mb-4">Responda as Perguntas</h2>
+                        <div id="scaleInstructionsContainer" style="margin-bottom: 25px;"></div>
+                        <div id="questionsContainer"></div>
+                        <div class="button-group mt-6"><button class="btn btn-secondary" onclick="backToSelection()">Voltar</button><button class="btn btn-primary" onclick="generateReport()">Gerar Resultado</button></div>
+                        <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
+                        <div id="previewPanel" class="preview-panel">
+                            <h3 class="text-xl font-bold mb-2">Pré-visualização do Resultado</h3>
+                            <div id="previewContent">Selecione as respostas...</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div id="screen3" class="screen container mx-auto max-w-6xl px-6 py-12">
+                    <div class="glass-panel p-6 md:p-10">
+                        <h2 class="text-2xl font-bold mb-4">Resultado da Escala</h2>
+                        <div id="resultArea" class="result-area glass-panel mt-4 p-4"></div>
+                        <div class="button-group mt-6"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="startNew()">Nova Avaliação</button></div>
+                    </div>
+                </div>
+            
+                <div id="questionModal" class="modal">
+                    <div class="modal-content p-6">
+                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                            <h3 id="questionModalTitle" class="text-xl font-bold">Adicionar/Editar Pergunta</h3><span class="close" onclick="closeQuestionModal()">&times;</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="form-group"><label for="questionText" class="block mb-1">Pergunta:</label><input type="text" id="questionText" placeholder="Ex: Paciente apresenta febre?" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
+                            <div class="form-group"><label for="questionExplanation" class="block mb-1">Explicação (Opcional):</label><textarea id="questionExplanation" rows="3" placeholder="Descreva o que a pergunta avalia..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea></div>
+                            <div class="form-group">
+                                <label class="block mb-1">Respostas Possíveis:</label>
+                                <div id="answersContainer"></div>
+                                <button class="btn btn-secondary btn-small mt-2" onclick="addAnswerField()">+ Adicionar Resposta</button>
+                            </div>
+                            <div class="button-group"><button id="saveQuestionBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeQuestionModal()">Cancelar</button></div>
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="scaleSettingsModal" class="modal">
+                    <div class="modal-content p-6">
+                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4"><h3 id="scaleSettingsModalTitle" class="text-xl font-bold">Configurar Interpretação</h3><span class="close" onclick="closeScaleSettingsModal()">&times;</span></div>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Defina as faixas de pontuação e o texto de resultado correspondente.</p>
+                        <div class="form-group">
+                            <label class="block mb-1">Regras de Interpretação:</label>
+                            <div class="interpretation-rule font-bold">
+                                <span>De (pontos)</span>
+                                <span>Até (pontos)</span>
+                                <span>Texto da Interpretação</span>
+                                <span></span>
+                            </div>
+                            <div id="interpretationsContainer"></div>
+                            <button class="btn btn-secondary btn-small mt-2" onclick="addInterpretationRule()">+ Adicionar Faixa</button>
+                        </div>
+                        <div class="button-group"><button id="saveScaleSettingsBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeScaleSettingsModal()">Cancelar</button></div>
+                    </div>
+                </div>
+            
+                <div id="helpModal" class="modal">
+                    <div class="modal-content p-6">
+                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                            <h3 class="text-xl font-bold">Como Usar as Escalas</h3>
+                            <span class="close" onclick="closeHelpModal()">&times;</span>
+                        </div>
+                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none">
+                            <h4>Passo 1: Selecione a Escala</h4>
+                            <p>Na tela inicial, clique na escala que deseja aplicar. As escalas selecionadas ficarão destacadas. Você pode adicionar suas próprias escalas customizadas clicando em "Adicionar Nova Escala".</p>
+                            
+                            <h4>Passo 2: Responda as Perguntas</h4>
+                            <p>Após selecionar a escala e clicar em "Prosseguir", você verá uma lista de perguntas. Marque as respostas correspondentes a sua avaliação.</p>
+                            <p>À direita, um painel de pré-visualização mostrará o resultado sendo montado em tempo real.</p>
+                            
+                            <h4>Passo 3: Gere e Copie o Resultado</h4>
+                            <p>Quando terminar de responder, clique em "Gerar Resultado". O texto final com a pontuação e interpretação será apresentado. Você pode então clicar em "Copiar" para transferir o resultado para a área de transferência.</p>
+            
+                            <hr class="my-4">
+            
+                            <h4>Recursos Adicionais:</h4>
+                            <ul class="list-disc pl-5">
+                                <li><strong>Adicionar Perguntas:</strong> Dentro de uma escala, na tela de edição, você pode adicionar perguntas customizadas.</li>
+                                <li><strong>Importar/Exportar:</strong> Use os botões no cabeçalho para salvar ("Exportar") suas configurações de escalas customizadas em um arquivo. Você pode carregar ("Importar") esse arquivo em outro computador ou navegador.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div id="screen1" class="screen active">
-            <h2>Selecione a Escala</h2>
-            <div class="form-group" style="margin-bottom:20px"><input type="text" id="scaleSearchInput" onkeyup="renderScaleSelection()" placeholder="Buscar escala por nome..."></div>
-            <div class="exam-grid" id="scaleGrid"></div>
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="proceedToScale()">Prosseguir</button>
-                <button class="btn btn-secondary" onclick="toggleAddScaleForm()">Adicionar Nova Escala</button>
-            </div>
-<div id="addScaleForm" class="add-exam-form hidden">
-<div class="form-group" style="display: flex; align-items: center; gap: 10px; justify-content: start;">
-    <input type="checkbox" id="newScaleProgressive" style="width: auto; height: auto;">
-    <label for="newScaleProgressive" style="margin-bottom: 0; font-weight: normal;">Esta é uma escala progressiva (lógica do "último sim", tipo PPS)</label>
-</div>
-    <h3 id="scaleFormTitle">Adicionar Nova Escala</h3>
-    <div class="form-group">
-        <label for="newScaleName">Nome da Escala:</label>
-        <input type="text" id="newScaleName">
-    </div>
-    <div class="form-group">
-        <label for="newScaleDescription">Descrição Curta (para o card de seleção):</label>
-        <input type="text" id="newScaleDescription" placeholder="Um resumo breve da escala...">
-    </div>
-    <div class="form-group">
-        <label for="newScaleInstructions">Instruções de Preenchimento (para a tela da escala):</label>
-        <textarea id="newScaleInstructions" rows="5" placeholder="Insira aqui as instruções detalhadas, objetivos, ou referências da escala..."></textarea>
-    </div>
-    <div class="button-group">
-        <button id="saveScaleBtn" class="btn btn-success" onclick="addNewScale()">Adicionar</button>
-        <button class="btn btn-secondary" onclick="toggleAddScaleForm()">Cancelar</button>
-    </div>
-</div>
-        </div>
-
-        <div id="screen2" class="screen">
-            <h2>Responda as Perguntas</h2>
-			    <div id="scaleInstructionsContainer" style="margin-bottom: 25px;"></div>
-    <div id="questionsContainer"></div>
-    <div class="button-group">
-        <button class="btn btn-secondary" onclick="backToSelection()">Voltar</button>
-        <button class="btn btn-primary" onclick="generateReport()">Gerar Resultado</button>
-    </div>
-    <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
-    <div id="previewPanel" class="preview-panel">
-        <h3>Pré-visualização do Resultado</h3>
-        <div id="previewContent">Selecione as respostas...</div>
-    </div>
-</div>
-
-        <div id="screen3" class="screen">
-            <h2>Resultado da Escala</h2>
-            <div id="resultArea" class="result-area"></div>
-            <div class="button-group"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="startNew()">Nova Avaliação</button></div>
-        </div>
-    </div>
-
-<div id="questionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="questionModalTitle">Adicionar/Editar Pergunta</h3><span class="close" onclick="closeQuestionModal()">&times;</span>
-            </div>
-            <div class="form-group">
-                <label for="questionText">Pergunta:</label>
-                <input type="text" id="questionText" placeholder="Ex: Paciente apresenta febre?">
-            </div>
-            <div class="form-group">
-                <label for="questionExplanation">Explicação (Opcional):</label>
-                <textarea id="questionExplanation" rows="3" placeholder="Descreva o que a pergunta avalia ou forneça contexto adicional..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>Respostas Possíveis:</label>
-                <div id="answersContainer"></div>
-                <button class="btn btn-secondary btn-small" onclick="addAnswerField()" style="margin-top:10px">+ Adicionar Resposta</button>
-            </div>
-            <div class="button-group">
-                <button id="saveQuestionBtn" class="btn btn-success">Salvar</button>
-                <button class="btn btn-secondary" onclick="closeQuestionModal()">Cancelar</button>
-            </div>
-        </div>
-    </div>
-   
-
-    <div id="scaleSettingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="scaleSettingsModalTitle">Configurar Interpretação da Escala</h3><span class="close" onclick="closeScaleSettingsModal()">&times;</span></div>
-            <p style="color: var(--cor-texto-secundario); margin-bottom: 20px;">Defina as faixas de pontuação e o texto de resultado correspondente.</p>
-            <div class="form-group">
-                <label>Regras de Interpretação:</label>
-                <div class="interpretation-rule" style="font-weight: bold;">
-                    <span>De (pontos)</span>
-                    <span>Até (pontos)</span>
-                    <span>Texto da Interpretação</span>
-                    <span></span>
-                </div>
-                <div id="interpretationsContainer"></div>
-                <button class="btn btn-secondary btn-small" onclick="addInterpretationRule()" style="margin-top:10px">+ Adicionar Faixa</button>
-            </div>
-            <div class="button-group">
-                <button id="saveScaleSettingsBtn" class="btn btn-success">Salvar Configurações</button>
-                <button class="btn btn-secondary" onclick="closeScaleSettingsModal()">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-<script src="escalasNativas.js"></script>
-<script src="../js/utils.js"></script>
-<script src="../js/scales.js"></script>
-
-</body>
-</html>
+            <script src="escalasNativas.js"></script>
+            <script src="../js/utils.js"></script>
+            <script src="../js/scales.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const currentPage = window.location.pathname.split('/').pop();
+                    const navLinks = document.querySelectorAll('.nav-link');
+                    navLinks.forEach(link => {
+                        const linkPage = link.getAttribute('href').split('/').pop();
+                        if (linkPage === currentPage) {
+                            link.classList.add('selected');
+                        }
+                    });
+                });
+            </script>
+            </body>
+            </html>
+            

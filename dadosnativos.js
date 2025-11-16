@@ -769,29 +769,396 @@ const examsData = {
         }
     }
   },
-  
-    "respiratorio": {
-        id: "respiratorio", name: "Sistema Respiratório", description: "Avaliação dos pulmões e vias aéreas",
-        findings: {
-            ausculta: {
-                name: "Ausculta",
-                items: [
-                    { 
-                        id: "vesicular_murmurs", question: "Murmúrios vesiculares?", type: "yes-no",
-                        answers: [
-                            { id: "ans1", text: "Normais", description: "Murmúrios vesiculares universalmente audíveis e sem ruídos adventícios" },
-                            { id: "ans2", text: "Alterados", description: "Murmúrios vesiculares diminuídos ou abolidos" }
-                        ]
-                    },
-                    {
-                        id: "adventitious_sounds", question: "Ruídos adventícios?", type: "yes-no",
-                        answers: [
-                            { id: "ans1", text: "Ausentes", description: "Sem ruídos adventícios" },
-                            { id: "ans2", text: "Presentes", description: "Presença de ruídos adventícios (ex: sibilos, estertores)" }
-                        ]
-                    }
-                ]
-            }
-        }
+  "abdome": {
+    "id": "abdome",
+    "name": "Abdome",
+    "description": "Exame dirigido do abdome com foco em inspeção, ausculta, percussão e palpação sistemática.",
+    "findings": {
+      "inspecao": {
+        "name": "Inspeção",
+        "items": [
+          {
+            "id": "abdome_1758130000001",
+            "question": "Contorno abdominal?",
+            "answers": [
+              { "id": "ans_1", "text": "Plano", "description": "Abdome plano, sem distensão" },
+              { "id": "ans_2", "text": "Globoso", "description": "Abdome globoso" },
+              { "id": "ans_3", "text": "Escavado", "description": "Abdome escavado" },
+              { "id": "ans_4", "text": "Distensão assimétrica", "description": "Distensão abdominal assimétrica" }
+            ],
+            "type": "multiple-choice",
+            "info": "Observe o abdome com o paciente em decúbito dorsal e cabeça apoiada. Avalie o contorno em visão tangencial e frontal, buscando abaulamentos localizados, retrações ou assimetrias. Verifique se a distensão acompanha movimentos respiratórios e se há cicatrizes que expliquem alterações anatômicas." 
+          },
+          {
+            "id": "abdome_1758130000002",
+            "question": "Cicatrizes ou lesões visíveis?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausentes", "description": "Sem cicatrizes ou lesões aparentes" },
+              { "id": "ans_2", "text": "Cicatrizes cirúrgicas", "description": "Cicatrizes cirúrgicas em abdome" },
+              { "id": "ans_3", "text": "Lesões dermatológicas", "description": "Lesões ou dermatites em abdome" }
+            ],
+            "type": "multiple-choice",
+            "info": "Inspecione à procura de cicatrizes medianas, transversas ou laparoscópicas que possam alterar a anatomia. Avalie também equimoses, circulação colateral, hérnias, nodulações cutâneas e lesões inflamatórias. Peça esclarecimentos sobre cirurgias prévias ou traumas se encontrar achados." 
+          },
+          {
+            "id": "abdome_1758130000003",
+            "question": "Peristalse visível?",
+            "answers": [
+              { "id": "ans_1", "text": "Não", "description": "Sem peristalse visível" },
+              { "id": "ans_2", "text": "Discreta", "description": "Peristalse discretamente visível" },
+              { "id": "ans_3", "text": "Acentuada", "description": "Peristalse acentuada visível" }
+            ],
+            "type": "multiple-choice",
+            "info": "Observe movimentos intestinais espontâneos por pelo menos um minuto. Peristalse visível intensa pode indicar obstrução mecânica proximal, enquanto ausência pode sugerir íleo paralítico. Anote direção dos movimentos (ex.: do quadrante superior esquerdo ao inferior direito)." 
+          }
+        ]
+      },
+      "ausculta": {
+        "name": "Ausculta",
+        "items": [
+          {
+            "id": "abdome_1758130000004",
+            "question": "Ruídos hidroaéreos?",
+            "answers": [
+              { "id": "ans_1", "text": "Normoativos", "description": "Ruídos hidroaéreos normoativos" },
+              { "id": "ans_2", "text": "Hipoativos", "description": "Ruídos hidroaéreos hipoativos" },
+              { "id": "ans_3", "text": "Hiperativos", "description": "Ruídos hidroaéreos hiperativos" },
+              { "id": "ans_4", "text": "Ausentes", "description": "Ausência de ruídos hidroaéreos" }
+            ],
+            "type": "multiple-choice",
+            "info": "Auscute com o diafragma do estetoscópio em cada quadrante por pelo menos 30 segundos. Classifique como normoativo (5 a 34 ruídos/min), hipoativo (<5), hiperativo (>34) ou ausente. Ruídos metálicos em salvas podem sugerir obstrução mecânica, enquanto silêncio prolongado sugere íleo paralítico ou peritonite." 
+          },
+          {
+            "id": "abdome_1758130000005",
+            "question": "Sopros vasculares?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausentes", "description": "Ausência de sopros abdominais" },
+              { "id": "ans_2", "text": "Aorta", "description": "Sopro sistólico em topografia de aorta" },
+              { "id": "ans_3", "text": "Renal", "description": "Sopro em topografia das artérias renais" },
+              { "id": "ans_4", "text": "Hepático", "description": "Sopro em região hepática" }
+            ],
+            "type": "multiple-choice",
+            "info": "Auscute específicos pontos: epigástrio (aorta), 2-3 cm acima e lateral ao umbigo (artérias renais) e hipocôndrio direito (artéria hepática). Sopros sisto-diastólicos sugerem estenoses significativas; sopros contínuos podem indicar fístulas arteriovenosas. Realize com paciente em apneia inspiratória curta para reduzir ruídos de fundo." 
+          }
+        ]
+      },
+      "percussao": {
+        "name": "Percussão",
+        "items": [
+          {
+            "id": "abdome_1758130000006",
+            "question": "Som predominante?",
+            "answers": [
+              { "id": "ans_1", "text": "Timpânico difuso", "description": "Som timpânico difuso à percussão" },
+              { "id": "ans_2", "text": "Submaciço difuso", "description": "Som submaciço difuso" },
+              { "id": "ans_3", "text": "Maciço em flancos", "description": "Macicez em flancos" },
+              { "id": "ans_4", "text": "Timpânico central com macicez periférica", "description": "Distribuição sugestiva de ascite" }
+            ],
+            "type": "multiple-choice",
+            "info": "Percuta todos os quadrantes com a polpa do dedo médio apoiada e golpeando com o dedo da mão dominante. Em condições normais predomina som timpânico. Macicez em flancos com timpanismo central sugere ascite; macicez localizada pode indicar massa sólida ou bexiga distendida." 
+          },
+          {
+            "id": "abdome_1758130000007",
+            "question": "Macicez móvel?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausente", "description": "Macicez móvel ausente" },
+              { "id": "ans_2", "text": "Presente", "description": "Macicez móvel detectada" }
+            ],
+            "type": "multiple-choice",
+            "info": "Com o paciente em decúbito, percussione do umbigo aos flancos para marcar a transição timpânico-maciço. Em seguida, peça para virar-se em decúbito lateral e repita. Deslocamento da área de macicez confirma macicez móvel, altamente sugestiva de ascite com líquido livre." 
+          }
+        ]
+      },
+      "palpacao": {
+        "name": "Palpação",
+        "items": [
+          {
+            "id": "abdome_1758130000008",
+            "question": "Dor à palpação superficial?",
+            "answers": [
+              { "id": "ans_1", "text": "Não", "description": "Sem dor à palpação superficial" },
+              { "id": "ans_2", "text": "Quadrante superior direito", "description": "Dor superficial em QSD" },
+              { "id": "ans_3", "text": "Quadrante inferior direito", "description": "Dor superficial em QID" },
+              { "id": "ans_4", "text": "Quadrante superior esquerdo", "description": "Dor superficial em QSE" },
+              { "id": "ans_5", "text": "Quadrante inferior esquerdo", "description": "Dor superficial em QIE" },
+              { "id": "ans_6", "text": "Hipogástrio/mesogástrio", "description": "Dor em região hipogástrica ou mesogástrica" },
+              { "id": "ans_7", "text": "Difusa", "description": "Dor superficial difusa" }
+            ],
+            "type": "multiple-choice",
+            "info": "Palpe levemente com a mão espalmada, iniciando pelos quadrantes assintomáticos. Observe defesa voluntária, fácies de dor e localize exatamente o ponto máximo. Reforce se há hipersensibilidade cutânea ou alodínia." 
+          },
+          {
+            "id": "abdome_1758130000009",
+            "question": "Sinal de descompressão brusca (Blumberg)?",
+            "answers": [
+              { "id": "ans_1", "text": "Negativo", "description": "Sinal de Blumberg negativo" },
+              { "id": "ans_2", "text": "Positivo", "description": "Sinal de Blumberg positivo" }
+            ],
+            "type": "multiple-choice",
+            "info": "Com o paciente relaxado, pressione gradualmente o quadrante suspeito com a mão espalmada e mantenha por alguns segundos; libere rapidamente. Dor maior na descompressão que na compressão define positividade e sugere irritação peritoneal. Evite em abdome agudo evidente para não intensificar sofrimento." 
+          },
+          {
+            "id": "abdome_1758130000010",
+            "question": "Palpação profunda do fígado?",
+            "answers": [
+              { "id": "ans_1", "text": "Não palpável", "description": "Borda hepática não palpável" },
+              { "id": "ans_2", "text": "Regular na borda costal", "description": "Fígado palpável, borda regular na linha hemiclavicular" },
+              { "id": "ans_3", "text": "Hepatomegalia >2 cm", "description": "Hepatomegalia com borda inferior >2 cm do rebordo costal" },
+              { "id": "ans_4", "text": "Borda irregular", "description": "Fígado palpável com borda irregular" }
+            ],
+            "type": "multiple-choice",
+            "info": "Posicione a mão esquerda na região lombar direita elevando o fígado anterior. Com a mão direita plana, inicie abaixo do rebordo costal direito e peça inspiração profunda, deslizando a mão cranialmente. Note consistência, borda, sensibilidade e presença de nódulos." 
+          },
+          {
+            "id": "abdome_1758130000011",
+            "question": "Palpação do baço?",
+            "answers": [
+              { "id": "ans_1", "text": "Não palpável", "description": "Baço não palpável" },
+              { "id": "ans_2", "text": "Pouco aumentado", "description": "Baço palpável discretamente abaixo do rebordo costal" },
+              { "id": "ans_3", "text": "Esplenomegalia importante", "description": "Esplenomegalia estendendo-se a fossa ilíaca" }
+            ],
+            "type": "multiple-choice",
+            "info": "Com o paciente em decúbito dorsal, coloque a mão direita em garra no quadrante superior esquerdo e a esquerda na região lombar contralateral para elevar o baço. Peça inspiração profunda enquanto desliza a mão cranialmente. Repita em decúbito lateral direito se necessário. Avalie consistência, borda e sensibilidade." 
+          }
+        ]
+      }
     }
+  },
+  "respiratorio": {
+    "id": "respiratorio",
+    "name": "Sistema Respiratório",
+    "description": "Exame segmentado do aparelho respiratório com foco em inspeção, ausculta, percussão e palpação.",
+    "findings": {
+      "inspecao": {
+        "name": "Inspeção",
+        "items": [
+          {
+            "id": "respiratorio_1758131000001",
+            "question": "Padrão respiratório observado?",
+            "answers": [
+              { "id": "ans_1", "text": "Eupneico", "description": "Respiração eupneica, sem uso de musculatura acessória" },
+              { "id": "ans_2", "text": "Taquipneico", "description": "Taquipneia com aumento da frequência" },
+              { "id": "ans_3", "text": "Bradipneico", "description": "Bradipneia" },
+              { "id": "ans_4", "text": "Uso de musculatura acessória", "description": "Uso visível de musculatura acessória" }
+            ],
+            "type": "multiple-choice",
+            "info": "Observe o paciente sentado, com tórax exposto, por pelo menos um ciclo completo de respiração. Conte a frequência respiratória sem avisar o paciente e identifique uso de musculatura acessória (esternocleidomastoideos, intercostais). Registre presença de tiragens, batimento de asa de nariz ou respiração paradoxal." 
+          },
+          {
+            "id": "respiratorio_1758131000002",
+            "question": "Movimentação torácica simétrica?",
+            "answers": [
+              { "id": "ans_1", "text": "Sim", "description": "Expansão torácica simétrica" },
+              { "id": "ans_2", "text": "Assimetria direita", "description": "Expansão reduzida à direita" },
+              { "id": "ans_3", "text": "Assimetria esquerda", "description": "Expansão reduzida à esquerda" }
+            ],
+            "type": "multiple-choice",
+            "info": "Inspecione o hemitórax anterior e posterior solicitando inspiração profunda. Assimetrias podem refletir atelectasia, derrame ou fratura de costela. Note retrações intercostais localizadas ou abaulamentos que sugiram pneumotórax hipertensivo." 
+          },
+          {
+            "id": "respiratorio_1758131000003",
+            "question": "Sinais de cianose?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausentes", "description": "Sem cianose periférica ou central" },
+              { "id": "ans_2", "text": "Perioral", "description": "Cianose perioral" },
+              { "id": "ans_3", "text": "Acral", "description": "Cianose em extremidades" },
+              { "id": "ans_4", "text": "Generalizada", "description": "Cianose generalizada" }
+            ],
+            "type": "multiple-choice",
+            "info": "Avalie lábios, leito ungueal e lóbulo das orelhas sob boa iluminação. Diferencie cianose periférica (vasoconstrição) de central (hipoxemia). Associe ao contexto clínico: taquipneia, saturação periférica e coloração da pele." 
+          }
+        ]
+      },
+      "ausculta": {
+        "name": "Ausculta",
+        "items": [
+          {
+            "id": "respiratorio_1758131000004",
+            "question": "Murmúrios vesiculares?",
+            "answers": [
+              { "id": "ans_1", "text": "Preservados", "description": "Murmúrios vesiculares preservados bilateralmente" },
+              { "id": "ans_2", "text": "Diminuídos difusos", "description": "Murmúrios vesiculares globalmente diminuídos" },
+              { "id": "ans_3", "text": "Abolidos localizados", "description": "Murmúrios vesiculares abolidos em região específica" }
+            ],
+            "type": "multiple-choice",
+            "info": "Auscute com diafragma do estetoscópio em pontos simétricos (ápices, bases, regiões axilares e infraclaviculares). Compare lado a lado para detectar diminuição localizada (derrame, pneumotórax) ou difusa (DPOC grave). Peça inspirações profundas pela boca." 
+          },
+          {
+            "id": "respiratorio_1758131000005",
+            "question": "Ruídos adventícios?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausentes", "description": "Sem ruídos adventícios" },
+              { "id": "ans_2", "text": "Estertores", "description": "Estertores crepitantes audíveis" },
+              { "id": "ans_3", "text": "Sibilos", "description": "Sibilos difusos" },
+              { "id": "ans_4", "text": "Roncos", "description": "Roncos expiratório-inspiratórios" }
+            ],
+            "type": "multiple-choice",
+            "info": "Caracterize ruídos adventícios conforme momento do ciclo respiratório, tonalidade e localização. Estertores finos nas bases sugerem edema ou fibrose; sibilos difusos indicam broncoespasmo; roncos podem desaparecer após tosse. Registre se melhoram com tosse ou manobras de expiração prolongada." 
+          },
+          {
+            "id": "respiratorio_1758131000006",
+            "question": "Sons vocais transmitidos?",
+            "answers": [
+              { "id": "ans_1", "text": "Normais", "description": "Transmissão vocal preservada" },
+              { "id": "ans_2", "text": "Broncofonia", "description": "Broncofonia presente" },
+              { "id": "ans_3", "text": "Pectorilóquia afônica", "description": "Pectorilóquia afônica presente" }
+            ],
+            "type": "multiple-choice",
+            "info": "Peça ao paciente para repetir a palavra 'trinta e três' ou sussurrar 's', auscultando áreas suspeitas. Aumento da transmissão (broncofonia/pectorilóquia) sugere consolidação; diminuição indica derrame ou enfisema. Compare bilateralmente e associe aos achados de percussão." 
+          }
+        ]
+      },
+      "percussao": {
+        "name": "Percussão",
+        "items": [
+          {
+            "id": "respiratorio_1758131000007",
+            "question": "Som predominante?",
+            "answers": [
+              { "id": "ans_1", "text": "Claro pulmonar", "description": "Som claro pulmonar difuso" },
+              { "id": "ans_2", "text": "Hipertimpanismo", "description": "Hipertimpanismo em hemitórax" },
+              { "id": "ans_3", "text": "Submaciço", "description": "Som submaciço localizado" },
+              { "id": "ans_4", "text": "Maciço", "description": "Som maciço sugestivo de derrame" }
+            ],
+            "type": "multiple-choice",
+            "info": "Percuta de cima para baixo comparando espaços intercostais correspondentes. Som claro pulmonar é esperado; hipertimpanismo indica hiperinsuflação ou pneumotórax, enquanto macicez aponta para consolidação ou derrame. Demarque o nível superior da macicez em derrames para seguimento." 
+          }
+        ]
+      },
+      "palpacao": {
+        "name": "Palpação",
+        "items": [
+          {
+            "id": "respiratorio_1758131000009",
+            "question": "Frêmito tóraco-vocal?",
+            "answers": [
+              { "id": "ans_1", "text": "Simétrico", "description": "Frêmito tóraco-vocal simétrico" },
+              { "id": "ans_2", "text": "Aumentado à direita", "description": "Frêmito aumentado em hemitórax direito" },
+              { "id": "ans_3", "text": "Aumentado à esquerda", "description": "Frêmito aumentado em hemitórax esquerdo" },
+              { "id": "ans_4", "text": "Diminuído bilateral", "description": "Frêmito globalmente diminuído" }
+            ],
+            "type": "multiple-choice",
+            "info": "Posicione as mãos ou borda cubital sobre regiões simétricas enquanto o paciente repete 'trinta e três'. Compare intensidade; aumento sugere condensação, diminuição indica derrame, pneumotórax ou obstrução brônquica. Realize em parede posterior e lateral." 
+          },
+          {
+            "id": "respiratorio_1758131000010",
+            "question": "Expansibilidade torácica?",
+            "answers": [
+              { "id": "ans_1", "text": "Preservada", "description": "Expansibilidade preservada" },
+              { "id": "ans_2", "text": "Reduzida à direita", "description": "Expansibilidade reduzida à direita" },
+              { "id": "ans_3", "text": "Reduzida à esquerda", "description": "Expansibilidade reduzida à esquerda" }
+            ],
+            "type": "multiple-choice",
+            "info": "Coloque polegares próximos à linha média posterior com mãos abraçando a caixa torácica. Solicite inspiração profunda e observe o afastamento dos polegares. Diferencie limitação unilateral (atelectasia, derrame) de bilateral (DPOC avançado)." 
+          },
+          {
+            "id": "respiratorio_1758131000011",
+            "question": "Dor à palpação costal?",
+            "answers": [
+              { "id": "ans_1", "text": "Ausente", "description": "Sem dor à palpação costal" },
+              { "id": "ans_2", "text": "Localizada", "description": "Dor localizada à palpação costal" },
+              { "id": "ans_3", "text": "Difusa", "description": "Dor difusa à palpação torácica" }
+            ],
+            "type": "multiple-choice",
+            "info": "Palpe suavemente cada arco costal com polpas digitais, aumentando pressão quando necessário. Dor localizada com ponto gatilho sugere costocondrite ou fratura oculta; dor difusa associada a hiperalgesia cutânea pode ocorrer em neuropatia pós-herpética." 
+          }
+        ]
+      }
+    }
+  },
+  "linfonodos": {
+    "id": "linfonodos",
+    "name": "Avaliação de Linfonodos",
+    "description": "Roteiro para inspeção e palpação sistemática das principais cadeias linfonodais.",
+    "findings": {
+      "inspecao": {
+        "name": "Inspeção",
+        "items": [
+          {
+            "id": "linfonodos_1758132000001",
+            "question": "Aumento visível de cadeias?",
+            "answers": [
+              { "id": "ans_1", "text": "Não", "description": "Sem aumento visível de linfonodos" },
+              { "id": "ans_2", "text": "Cervical", "description": "Aumento cervical visível" },
+              { "id": "ans_3", "text": "Supraclavicular", "description": "Aumento supraclavicular visível" },
+              { "id": "ans_4", "text": "Axilar", "description": "Aumento axilar visível" }
+            ],
+            "type": "multiple-choice",
+            "info": "Observe pescoço, fossas supraclaviculares e axilas com boa iluminação. Procure abaulamentos, eritema ou lesões cutâneas que possam justificar linfonodomegalias. Registre se há sinais inflamatórios locais ou cicatrizes de procedimentos prévios." 
+          }
+        ]
+      },
+      "cervical": {
+        "name": "Palpação Cervical",
+        "items": [
+          {
+            "id": "linfonodos_1758132000002",
+            "question": "Cadeias cervicais anteriores?",
+            "answers": [
+              { "id": "ans_1", "text": "Não palpáveis", "description": "Linfonodos cervicais anteriores não palpáveis" },
+              { "id": "ans_2", "text": "Discretamente aumentados", "description": "Linfonodos cervicais anteriores discretamente aumentados" },
+              { "id": "ans_3", "text": "Aumentados e dolorosos", "description": "Linfonodos cervicais anteriores aumentados e dolorosos" },
+              { "id": "ans_4", "text": "Aumentados endurecidos", "description": "Linfonodos cervicais anteriores endurecidos" }
+            ],
+            "type": "multiple-choice",
+            "info": "Palpe com a polpa dos dedos indicador e médio ao longo do músculo esternocleidomastoideo, começando no ângulo da mandíbula até a fossa supraclavicular. Avalie tamanho (<1 cm fisiológico), mobilidade, dor e consistência (elástica x pétrea)." 
+          },
+          {
+            "id": "linfonodos_1758132000003",
+            "question": "Cadeias cervicais posteriores?",
+            "answers": [
+              { "id": "ans_1", "text": "Não palpáveis", "description": "Linfonodos cervicais posteriores não palpáveis" },
+              { "id": "ans_2", "text": "Aumentados móveis", "description": "Linfonodos cervicais posteriores aumentados e móveis" },
+              { "id": "ans_3", "text": "Aumentados aderidos", "description": "Linfonodos cervicais posteriores aderidos a planos profundos" }
+            ],
+            "type": "multiple-choice",
+            "info": "Coloque a mão na nuca, palpando com movimentos circulares sob o trapézio até a linha do cabelo. Linfonodos aderidos ou em \"cadeias\" endurecidas requerem investigação para linfoma/metástase." 
+          }
+        ]
+      },
+      "supraclavicular": {
+        "name": "Palpação Supraclavicular/Axilar",
+        "items": [
+          {
+            "id": "linfonodos_1758132000004",
+            "question": "Fossa supraclavicular?",
+            "answers": [
+              { "id": "ans_1", "text": "Sem linfonodos", "description": "Fossa supraclavicular livre" },
+              { "id": "ans_2", "text": "Nódulo direito", "description": "Linfonodo supraclavicular direito palpável" },
+              { "id": "ans_3", "text": "Nódulo esquerdo (Virchow)", "description": "Linfonodo supraclavicular esquerdo palpável" }
+            ],
+            "type": "multiple-choice",
+            "info": "Com o paciente sentado e ombros relaxados, deslize os dedos na fossa supraclavicular pedindo leve flexão anterior da cabeça. Linfonodo esquerdo endurecido (Virchow) sugere doença abdominal; o direito, tórax/pulmão." 
+          },
+          {
+            "id": "linfonodos_1758132000005",
+            "question": "Cadeias axilares?",
+            "answers": [
+              { "id": "ans_1", "text": "Não palpáveis", "description": "Linfonodos axilares não palpáveis" },
+              { "id": "ans_2", "text": "Discretos e móveis", "description": "Linfonodos axilares discretos e móveis" },
+              { "id": "ans_3", "text": "Aumentados endurecidos", "description": "Linfonodos axilares aumentados endurecidos" }
+            ],
+            "type": "multiple-choice",
+            "info": "Com o braço do paciente em abdução leve, explore parede torácica anterior, posterior e cadeia central. Comprima o conteúdo axilar contra a parede torácica para verificar tamanho, consistência e aderência." 
+          }
+        ]
+      },
+      "inguinal": {
+        "name": "Palpação Inguinal",
+        "items": [
+          {
+            "id": "linfonodos_1758132000006",
+            "question": "Linfonodos inguinais?",
+            "answers": [
+              { "id": "ans_1", "text": "Até 1 cm, móveis", "description": "Linfonodos inguinais fisiológicos" },
+              { "id": "ans_2", "text": "Aumentados dolorosos", "description": "Linfonodos inguinais aumentados e dolorosos" },
+              { "id": "ans_3", "text": "Aumentados endurecidos", "description": "Linfonodos inguinais aumentados endurecidos" }
+            ],
+            "type": "multiple-choice",
+            "info": "Posicione o paciente em decúbito dorsal, joelhos semifletidos. Palpe a região ao longo do ligamento inguinal e triângulo de Scarpa. Diferencie linfonodomegalia reacional (dolorosa, móvel) de suspeita neoplásica (dura, aderida)." 
+          }
+        ]
+      }
+    }
+  }
 };

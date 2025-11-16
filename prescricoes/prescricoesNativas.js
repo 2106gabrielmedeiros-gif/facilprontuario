@@ -1,34 +1,33 @@
 const prescriptionsData = {
-    "disease_1": {
-        "id": "disease_1",
-        "name": "Anemia Ferropriva",
-        "options": [
-            {
-                "id": "option_1_1",
-                "name": "Tratamento Oral",
-                "text": "Sulfato Ferroso 300mg, 1 comprimido, via oral, 2 vezes ao dia, por 3 meses."
-            },
-            {
-                "id": "option_1_2",
-                "name": "Tratamento Endovenoso",
-                "text": "Ferinject 500mg, 1 ampola, via endovenosa, diluído em 250ml de soro fisiológico, correr em 1 hora."
-            }
-        ]
-    },
-    "disease_2": {
-        "id": "disease_2",
-        "name": "Hipertensão Arterial Sistêmica",
-        "options": [
-            {
-                "id": "option_2_1",
-                "name": "Tratamento Inicial",
-                "text": "Losartana 50mg, 1 comprimido, via oral, 1 vez ao dia."
-            },
-            {
-                "id": "option_2_2",
-                "name": "Tratamento Associado",
-                "text": "Anlodipino 5mg, 1 comprimido, via oral, 1 vez ao dia."
-            }
-        ]
+    "anemia_ferropriva_1759018503068": {
+      "id": "anemia_ferropriva_1759018503068",
+      "name": "Anemia Ferropriva",
+      "options": [
+        {
+          "id": "anemia_ferropriva_opt_1759019448477",
+          "name": "Tratamento Endovenoso - Ferinject",
+          "text": "Carboximaltose férrica 50mg/ml ----------\nAplicar até 02 ampolas, diluídas em 250ml de SF 0,9%, EV lento.\nEm caso de necessidade de reaplicação, preferir dose de 1 ampola de cada vez, com uma semana de intervalo entre as aplicações."
+        },
+        {
+          "id": "anemia_ferropriva_opt_1759019134545",
+          "name": "Tratamento Endovenoso - Noripurum",
+          "text": "Sacarato de hidróxido férrico 20mg/ml ---------\nDiluir 02 ampolas em 250ml de SF 0,9% e aplicar endovenoso lentamente (30-45 minutos). Repetir aplicação em dias alternados."
+        },
+        {
+          "id": "anemia_ferropriva_opt_1759018809343",
+          "name": "Tratamento Oral - Dexfer",
+          "text": "Ferripolimaltose 400 mg ----------\nTomar 01 comprimido, via oral, em jejum. Preferir tratamento em dias alternados."
+        },
+        {
+          "id": "anemia_ferropriva_opt_1759018970752",
+          "name": "Tratamento Oral - Fisiogen",
+          "text": "Fisiogen Ferro 30mg --------\nTomar 01 comprimido ao dia, via oral."
+        },
+        {
+          "id": "anemia_ferropriva_opt_1759018662984",
+          "name": "Tratamento Oral - Sulfato Ferroso",
+          "text": "Sulfato Ferroso 40 mg ------------\nTomar 03 comprimidos, via oral, em jejum. Preferir tratamento em dias alternados. Não utilizar em conjunto com cálcio."
+        }
+      ]
     }
 };

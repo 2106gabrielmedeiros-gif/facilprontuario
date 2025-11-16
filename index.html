@@ -1,153 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth dark" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prontuário Fácil</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Prontuário Fácil | Transforme seus atendimentos</title>
+    <meta name="description" content="Plataforma open-source para gerar laudos, escalas clínicas e prescrições com rapidez e consistência.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 20% 20%, rgba(14,165,233,0.15), transparent 40%),
+                        radial-gradient(circle at 80% 0%, rgba(59,130,246,0.2), transparent 45%),
+                        linear-gradient(135deg, #020617 0%, #0f172a 40%, #111827 100%);
+        }
+        .glass {
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .feature-card {
+            border: 1px solid rgba(148,163,184,0.25);
+            transition: all .25s ease;
+        }
+        .feature-card:hover {
+            border-color: rgba(59,130,246,0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 25px 45px -22px rgba(15,23,42,0.65);
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Prontuário Fácil</h1>
-            <p>Versão 0.1</p>
-           <div class="header-actions">
-                <div class="left-actions">
-                    <button class="btn btn-primary btn-small" onclick="location.href='escalas/index.html'">Escalas</button>
-                    <button class="btn btn-primary btn-small" onclick="location.href='prescricoes/index.html'">Prescrições</button>
-                    <button class="btn btn-primary btn-small" onclick="openHelpModal()">Ajuda</button>
+<body class="text-slate-100 antialiased">
+    <header class="relative overflow-hidden">
+        <nav class="max-w-6xl mx-auto flex flex-wrap items-center justify-between px-6 py-6">
+            <a href="index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
+            <div class="flex gap-1 text-slate-300 text-sm uppercase tracking-wide">
+                <a href="#recursos" class="px-3 py-2 rounded-full hover:text-white hover:bg-white/10">Recursos</a>
+                <a href="#fluxo" class="px-3 py-2 rounded-full hover:text-white hover:bg-white/10">Fluxo</a>
+                <a href="#sobre" class="px-3 py-2 rounded-full hover:text-white hover:bg-white/10">Sobre</a>
+            </div>
+            <div class="flex flex-wrap gap-3 text-sm font-semibold">
+                <a href="exames.html" class="px-4 py-2 rounded-full border border-white/20 text-white hover:border-white/60">Exames</a>
+                <a href="escalas/index.html" class="px-4 py-2 rounded-full border border-white/20 text-white hover:border-white/60">Escalas</a>
+                <a href="prescricoes/index.html" class="px-4 py-2 rounded-full border border-white/20 text-white hover:border-white/60">Prescrições</a>
+            </div>
+        </nav>
+
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 px-6 pt-6 pb-16 lg:pb-28">
+            <div class="space-y-8">
+                <p class="inline-flex items-center gap-2 text-sm font-semibold text-sky-200/90 uppercase tracking-[0.3em]">open-source • pronto para o plantão</p>
+                <h1 class="text-4xl lg:text-5xl font-bold leading-tight text-white">Organize laudos, escalas e prescrições em um fluxo confiável e elegante.</h1>
+                <p class="text-lg text-slate-300">Transforme seus atendimentos com roteiros clínicos detalhados, geração instantânea de texto e personalização completa — tudo direto do navegador.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="exames.html" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-400 font-semibold text-slate-950 shadow-lg shadow-sky-500/30">Começar agora</a>
+                    <a href="#recursos" class="px-6 py-3 rounded-2xl border border-white/20 font-semibold text-white hover:border-white/60">Ver recursos</a>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="export-button" class="btn btn-secondary btn-small" onclick="exportData('exams')">Exportar</button>
-                    <label class="btn btn-secondary btn-small" style="display:inline-flex;align-items:center;cursor:pointer">Importar<input type="file" accept="application/json" onchange="handleImport(this.files[0])" style="display:none"></label>
-                    <button class="btn btn-danger btn-small" onclick="masterReset()">Reset Total</button>
-                    <button id="theme-toggle" class="theme-toggle-btn">?</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen1" class="screen active">
-            <h2>Selecione os Exames</h2>
-            <div class="form-group" style="margin-bottom:20px"><input type="text" id="examSearchInput" onkeyup="renderExamSelection()" placeholder="Buscar exame por nome..."></div>
-            <div class="exam-grid" id="examGrid"></div>
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="proceedToExam()">Prosseguir</button>
-                <button class="btn btn-secondary" onclick="toggleAddExamForm()">Adicionar Novo Exame</button>
-            </div>
-            <div id="addExamForm" class="add-exam-form hidden">
-                <h3 id="examFormTitle">Adicionar Novo Exame</h3>
-                <div class="form-group"><label for="newExamName">Nome:</label><input type="text" id="newExamName"></div>
-                <div class="form-group"><label for="newExamDescription">Descrição:</label><input type="text" id="newExamDescription"></div>
-                <div class="button-group"><button id="saveExamBtn" class="btn btn-success" onclick="addNewExam()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddExamForm()">Cancelar</button></div>
-            </div>
-        </div>
-
-        <div id="screen2" class="screen">
-            <h2>Registre os Achados</h2>
-            <div id="findingsContainer"></div>
-            <div class="button-group"><button class="btn btn-secondary" onclick="backToSelection()">Voltar</button><button class="btn btn-primary" onclick="generateReport()">Gerar Laudo</button></div>
-            <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
-            <div id="previewPanel" class="preview-panel">
-                <h3>Pré-visualização</h3>
-                <div id="previewContent">Selecione os achados...</div>
-            </div>
-        </div>
-
-        <div id="screen3" class="screen">
-            <h2>Descrição do Exame Físico</h2>
-            <div id="resultArea" class="result-area"></div>
-            <div class="button-group"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="newExam()">Novo Exame</button></div>
-        </div>
-    </div>
-
-    <div id="findingModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="findingModalTitle">Adicionar/Editar Achado</h3><span class="close" onclick="closeFindingModal()">&times;</span></div>
-            
-            <div class="form-group">
-                <label for="findingType">Tipo de Pergunta:</label>
-                <select id="findingType" onchange="updateFindingModalUI()">
-                    <option value="multiple-choice">Múltipla Escolha / Sim-Não</option>
-                    <option value="open-text">Texto Aberto (ex: Sinais Vitais)</option>
-                </select>
-            </div>
-
-            <div class="form-group"><label for="findingQuestion">Pergunta:</label><input type="text" id="findingQuestion" placeholder="Ex: Bulhas cardíacas? ou Frequência Cardíaca"></div>
-            
-            <div class="form-group bordered-section">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="checkbox" id="conditionalCheckbox" onclick="toggleConditionalUI()">
-                    <strong>Exibição Condicional</strong>
-                </label>
-                <div id="conditionalControls" class="hidden" style="margin-top: 10px; padding-left: 20px;">
-                    <p style="font-size: 0.9em; color: #6c757d;">Exibir este achado somente se:</p>
-                    <div class="form-group">
-                        <label for="triggerFindingSelect">A resposta para o achado...</label>
-                        <select id="triggerFindingSelect" class="form-control" style="width:100%; padding:8px;"></select>
+                <dl class="grid grid-cols-3 gap-4 text-center text-sm text-slate-300">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <dt class="text-3xl font-semibold text-white">30+</dt>
+                        <dd>Roteiros guiados</dd>
                     </div>
-                    <div class="form-group">
-                        <label for="triggerAnswerSelect">...for igual a...</label>
-                        <select id="triggerAnswerSelect" class="form-control" style="width:100%; padding:8px;"></select>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <dt class="text-3xl font-semibold text-white">100%</dt>
+                        <dd>Offline no navegador</dd>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <dt class="text-3xl font-semibold text-white">∞</dt>
+                        <dd>Customizações</dd>
+                    </div>
+                </dl>
+            </div>
+            <div class="relative">
+                <div class="absolute -top-10 -right-6 w-56 h-56 bg-sky-500/20 blur-3xl rounded-full"></div>
+                <div class="absolute top-12 -left-8 w-40 h-40 bg-emerald-400/10 blur-3xl rounded-full"></div>
+                <div class="glass relative z-10 rounded-[32px] border border-white/15 bg-white/5 shadow-2xl p-6 space-y-6">
+                    <div class="flex items-center justify-between text-sm text-slate-200">
+                        <span class="font-semibold">Pré-visualização</span>
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-white/80">Tempo real</span>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4 space-y-3 text-sm text-slate-200">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold">Inspeção Geral</span>
+                            <span class="text-emerald-300">✔</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">Paciente em bom estado geral, corado, hidratado, eupneico em ar ambiente. SSVV estáveis.</p>
+                        <div class="pt-3 border-t border-white/5">
+                            <p class="text-xs uppercase tracking-widest text-slate-400">Laudo gerado</p>
+                            <p class="text-sm text-white">**Sistema Respiratório:** Murmúrios vesiculares preservados, ausência de ruídos adventícios.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="reportLabelGroup" class="form-group hidden">
-                <label for="findingReportLabel">Etiqueta para o Laudo (ex: FC):</label>
-                <input type="text" id="findingReportLabel" placeholder="Ex: FC, PA, FR, SpO2">
-            </div>
+        </div>
+    </header>
 
-            <div id="answersGroup">
-                <div class="form-group">
-                    <label>Respostas Possíveis:</label>
-                    <div id="answersContainer"></div>
-                    <button class="btn btn-secondary btn-small" onclick="addAnswerField()" style="margin-top:10px">+ Adicionar Resposta</button>
+    <main class="bg-slate-50 text-slate-900 rounded-t-[40px] -mt-12 relative z-20">
+        <section id="recursos" class="max-w-6xl mx-auto px-6 py-20">
+            <div class="text-center mb-12">
+                <p class="text-sm font-semibold text-sky-500 tracking-[0.4em] uppercase">Recursos</p>
+                <h2 class="text-3xl font-bold mt-2 text-slate-900">Todo o cuidado clínico em um só lugar</h2>
+                <p class="text-slate-500 mt-3 max-w-2xl mx-auto">Seja em enfermaria, emergência ou consultório, você conta com roteiros completos, escalas validadas e modelos de prescrição sempre prontos.</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <article class="feature-card rounded-3xl bg-white p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl font-bold mb-4">EF</div>
+                    <h3 class="text-xl font-semibold text-slate-900">Exame Físico guiado</h3>
+                    <p class="text-slate-500 mt-2">Seleciona sistemas, registra achados, adiciona detalhes e gera laudos textuais coerentes automaticamente.</p>
+                    <a href="exames.html" class="mt-4 inline-flex items-center text-sky-600 font-semibold">Abrir Exames →</a>
+                </article>
+                <article class="feature-card rounded-3xl bg-white p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4">SC</div>
+                    <h3 class="text-xl font-semibold text-slate-900">Escalas clínicas</h3>
+                    <p class="text-slate-500 mt-2">Aplicação rápida de escalas com interpretação automática e armazenamento de respostas no navegador.</p>
+                    <a href="escalas/index.html" class="mt-4 inline-flex items-center text-emerald-600 font-semibold">Abrir Escalas →</a>
+                </article>
+                <article class="feature-card rounded-3xl bg-white p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center text-xl font-bold mb-4">RX</div>
+                    <h3 class="text-xl font-semibold text-slate-900">Prescrições inteligentes</h3>
+                    <p class="text-slate-500 mt-2">Biblioteca de prescrições com variáveis editáveis, ideal para plantões dinâmicos.</p>
+                    <a href="prescricoes/index.html" class="mt-4 inline-flex items-center text-violet-600 font-semibold">Abrir Prescrições →</a>
+                </article>
+            </div>
+        </section>
+
+        <section id="fluxo" class="bg-slate-900 text-slate-100">
+            <div class="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-400 tracking-[0.4em] uppercase">Fluxo de trabalho</p>
+                    <h2 class="text-3xl font-bold mt-3">Comece em segundos e mantenha consistência entre equipes.</h2>
+                    <p class="mt-4 text-slate-300">Seu progresso fica salvo localmente, permitindo retomar consultas, criar roteiros personalizados e compartilhar presets entre colegas via exportação/importação.</p>
                 </div>
+                <ol class="space-y-6">
+                    <li class="glass border border-white/10 rounded-3xl p-5">
+                        <span class="text-xs uppercase tracking-[0.4em] text-slate-400">Passo 1</span>
+                        <p class="text-xl font-semibold text-white mt-2">Escolha os sistemas relevantes</p>
+                        <p class="text-slate-300">Selecione exames físicos ou escalas necessárias e personalize perguntas conforme o caso.</p>
+                    </li>
+                    <li class="glass border border-white/10 rounded-3xl p-5">
+                        <span class="text-xs uppercase tracking-[0.4em] text-slate-400">Passo 2</span>
+                        <p class="text-xl font-semibold text-white mt-2">Registre achados com contexto</p>
+                        <p class="text-slate-300">Adicione detalhes, anexe instruções clínicas e consulte dicas rápidas diretamente na interface.</p>
+                    </li>
+                    <li class="glass border border-white/10 rounded-3xl p-5">
+                        <span class="text-xs uppercase tracking-[0.4em] text-slate-400">Passo 3</span>
+                        <p class="text-xl font-semibold text-white mt-2">Gere, revise e exporte</p>
+                        <p class="text-slate-300">Laudos e prescrições ficam prontos para copiar, imprimir ou compartilhar por prontuários eletrônicos.</p>
+                    </li>
+                </ol>
             </div>
+        </section>
 
-            <div class="form-group"><label for="findingInfo">Texto de Informação (Opcional):</label><textarea id="findingInfo" rows="4" placeholder="Explique o que é este achado..."></textarea></div>
-            <div class="button-group"><button id="saveFindingBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeFindingModal()">Cancelar</button></div>
-        </div>
-    </div>
-
-    <div id="infoModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>Informações sobre o Achado</h3><span class="close" onclick="closeInfoModal()">&times;</span></div>
-            <div id="infoModalContent" style="white-space:pre-wrap;line-height:1.7"></div>
-        </div>
-    </div>
-
-    <div id="helpModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Como Usar o Prontuário Fácil</h3>
-                <span class="close" onclick="closeHelpModal()">&times;</span>
-            </div>
-            <div id="helpModalContent" style="line-height:1.7">
-                <h4>Passo 1: Selecione os Exames</h4>
-                <p>Na tela inicial, clique nos roteiros de examinação que deseja incluir na sua consulta. Os exames selecionados ficarão destacados. Você pode adicionar seus próprios exames customizados clicando em "Adicionar Novo Exame" (não recomendamos).</p>
-                
-                <h4>Passo 2: Registre os Achados</h4>
-                <p>Após selecionar os exames e clicar em "Prosseguir", você verá uma lista de seções e perguntas para cada exame. Clique nos botões (ex: "Sim", "Não") para registrar suas observações. Para perguntas de texto (como Sinais Vitais), basta digitar o valor no campo correspondente.</p>
-                <p>À direita, um painel de pré-visualização mostrará o laudo sendo montado em tempo real.</p>
-                
-                <h4>Passo 3: Gere e Copie o Laudo</h4>
-                <p>Quando terminar de registrar os achados, clique em "Gerar Laudo". O texto final será apresentado. Você pode então clicar em "Copiar" para transferir o laudo para a área de transferência e colar onde precisar.</p>
-
-                <hr style="margin: 20px 0;">
-
-                <h4>Recursos Adicionais:</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong>Adicionar Achados:</strong> Dentro de um exame, na tela de registro, você pode adicionar perguntas customizadas (achados) a qualquer seção clicando no botão "+".</li>
-                    <li><strong>Importar/Exportar:</strong> Use os botões no cabeçalho para salvar ("Exportar") suas configurações de exames e achados customizados em um arquivo. Você pode carregar ("Importar") esse arquivo em outro computador ou navegador para ter seus dados sempre à mão.</li>
-                    <li><strong>Limpar Sessão:</strong> Este botão apaga os exames e achados selecionados na sua sessão atual, permitindo começar um novo laudo do zero.</li>
+        <section id="sobre" class="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <p class="text-sm font-semibold text-sky-500 tracking-[0.4em] uppercase">Sobre o projeto</p>
+                <h2 class="text-3xl font-bold text-slate-900">Open-source, offline e pronto para evoluir com a sua equipe.</h2>
+                <p class="text-slate-600">O Prontuário Fácil nasce da comunidade médica para a comunidade médica. Código aberto, arquitetura simples e foco total na produtividade em situações críticas.</p>
+                <ul class="space-y-3 text-slate-600">
+                    <li class="flex items-start gap-3"><span class="text-sky-500 font-bold">•</span>Persistência em localStorage e exportação JSON para migrar dados entre dispositivos.</li>
+                    <li class="flex items-start gap-3"><span class="text-sky-500 font-bold">•</span>Modo escuro automático, suporte a atalhos e modo offline nativo.</li>
+                    <li class="flex items-start gap-3"><span class="text-sky-500 font-bold">•</span>Componentes prontos para receber integrações com prontuários eletrônicos.</li>
                 </ul>
             </div>
+            <div class="glass rounded-[32px] border border-slate-200/70 bg-white p-8 shadow-2xl">
+                <h3 class="text-xl font-semibold text-slate-900">Implemente com sua equipe</h3>
+                <p class="text-slate-600 mt-2">Compartilhe os roteiros, exporte presets e padronize condutas entre plantões sem depender de integrações complexas.</p>
+                <div class="mt-6 flex flex-wrap gap-4">
+                    <a href="exames.html" class="px-6 py-3 rounded-2xl bg-slate-900 text-white font-semibold">Testar Exames</a>
+                    <a href="prescricoes/index.html" class="px-6 py-3 rounded-2xl border border-slate-900 text-slate-900 font-semibold">Ver Prescrições</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-sm">
+        <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p>© <span id="year"></span> Prontuário Fácil. Projeto aberto para uso clínico responsável.</p>
+            <div class="flex gap-4">
+                <a href="exames.html" class="hover:text-white">Exames</a>
+                <a href="escalas/index.html" class="hover:text-white">Escalas</a>
+                <a href="prescricoes/index.html" class="hover:text-white">Prescrições</a>
+            </div>
         </div>
-    </div>
+    </footer>
 
-<script src="dadosnativos.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/main.js"></script>
-
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
