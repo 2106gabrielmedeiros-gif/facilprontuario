@@ -83,7 +83,7 @@ function toggleAddDiseaseForm() {
 
 function addNewDisease() {
     const name = document.getElementById('newDiseaseName').value.trim();
-    if (!name) return alert("O nome da doença é obrigatório.");
+    if (!name) return showToast("O nome da doença é obrigatório.", 'error');
 
     const newId = 'custom_' + Date.now();
     customPrescriptions[newId] = {
@@ -115,7 +115,7 @@ function openEditDiseaseForm(diseaseId, event) {
 function saveDiseaseChanges() {
     if (!editingDiseaseId) return;
     const name = document.getElementById('newDiseaseName').value.trim();
-    if (!name) return alert("O nome da doença é obrigatório.");
+    if (!name) return showToast("O nome da doença é obrigatório.", 'error');
 
     customPrescriptions[editingDiseaseId].name = name;
     saveCustomData();
@@ -166,7 +166,7 @@ function renderPrescriptionOptions() {
 function copyToClipboard(optionId) {
     const option = findOptionById(selectedDiseaseId, optionId);
     if (option) {
-        navigator.clipboard.writeText(option.text).then(() => alert('Prescrição copiada para a área de transferência!'));
+        navigator.clipboard.writeText(option.text).then(() => showToast('Prescrição copiada para a área de transferência!', 'success'));
     }
 }
 
@@ -199,7 +199,7 @@ function closeOptionModal() {
 function addNewOption() {
     const name = document.getElementById('optionName').value.trim();
     const text = document.getElementById('optionText').value.trim();
-    if (!name || !text) return alert('O nome da opção e o texto da prescrição são obrigatórios.');
+    if (!name || !text) return showToast('O nome da opção e o texto da prescrição são obrigatórios.', 'error');
 
     const newOption = {
         id: `custom_opt_${Date.now()}`,
@@ -221,7 +221,7 @@ function saveOptionChanges() {
 
     const name = document.getElementById('optionName').value.trim();
     const text = document.getElementById('optionText').value.trim();
-    if (!name || !text) return alert('O nome da opção e o texto da prescrição são obrigatórios.');
+    if (!name || !text) return showToast('O nome da opção e o texto da prescrição são obrigatórios.', 'error');
 
     const disease = customPrescriptions[selectedDiseaseId];
     if (disease) {

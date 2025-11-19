@@ -4,128 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo ao Prontuário Fácil</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
         }
-        
-        @keyframes glowPulse {
-            0% { text-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-            50% { text-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 25px rgba(45, 212, 191, 0.6); }
-            100% { text-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-        }
-        
-        @keyframes subtleBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
-        /* Classes utilitárias para a animação com delay */
-        .animate-fade-in-up {
-            animation: fadeInUp 1s ease-out forwards;
-            opacity: 0; /* Começa invisível */
-        }
-        
-        .animate-glow-pulse {
-            animation: glowPulse 2s infinite ease-in-out;
-        }
-        
-        .animate-subtle-bounce {
-            animation: subtleBounce 2s infinite ease-in-out;
-        }
-        
-        /* Delays para escalonar a entrada dos elementos reduzidos para carregamento mais rápido */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-        
-        /* Background particles for a starry effect */
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.2; }
-        }
-
-        /* Garantir visibilidade imediata se animações falharem */
-        body.loaded .animate-fade-in-up {
-            opacity: 1;
-            transform: translateY(0);
+        .glass-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-indigo-900 to-blue-900 text-white min-h-screen flex flex-col items-center justify-center font-sans p-4 relative overflow-hidden" onload="document.body.classList.add('loaded');">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-slate-100">
 
-    <!-- Starry background for cosmic feel -->
-    <div class="stars">
-        <script>
-            // Generate random stars
-            const starsContainer = document.querySelector('.stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                star.style.width = `${Math.random() * 2 + 1}px`;
-                star.style.height = star.style.width;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.animationDelay = `${Math.random() * 2}s`;
-                starsContainer.appendChild(star);
-            }
-        </script>
-    </div>
+    <div class="w-full max-w-2xl glass-card rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-emerald-400 to-sky-500"></div>
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"></div>
 
-    <div class="w-full max-w-3xl bg-gradient-to-br from-black/50 to-blue-900/30 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-12 text-center overflow-hidden border border-blue-500/20 transform hover:scale-105 transition-transform duration-500 ease-in-out">
-        
-        <div class="content relative z-10">
+        <div class="relative z-10 space-y-8">
+            <div class="space-y-2">
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white">
+                    Prontuário Fácil
+                </h1>
+                <p class="text-lg text-slate-400 font-medium">
+                    Produtividade clínica, simplificada.
+                </p>
+            </div>
             
-            <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-cyan-200 animate-fade-in-up animate-glow-pulse">
-                Prontuário Fácil
-            </h1>
-            
-            <p class="text-xl md:text-2xl text-gray-200 mt-4 animate-fade-in-up delay-1">
-                Sua ferramenta open-source para agilizar a criação de laudos e prescrições médicas.
+            <p class="text-slate-400 leading-relaxed max-w-lg mx-auto">
+                Gere laudos de exames físicos, aplique escalas clínicas e crie prescrições com rapidez. Uma ferramenta open-source projetada para o seu plantão.
             </p>
             
-            <p class="text-md md:text-lg text-gray-300 mt-6 leading-relaxed max-w-xl mx-auto animate-fade-in-up delay-2">
-                O Prontuário Fácil foi projetado para simplificar o dia a dia de profissionais de saúde. Com ele, você pode gerar laudos de exames físicos, aplicar escalas clínicas e criar prescrições de forma rápida e intuitiva, tudo em um só lugar.
-            </p>
-            
-            <button class="mt-10 px-10 py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-teal-600 hover:scale-110 transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 animate-fade-in-up delay-3 animate-subtle-bounce" onclick="location.href='index.html'">
-                Começar a Usar
-            </button>
+            <div class="pt-4">
+                <a href="index.html" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white transition-all duration-200 bg-sky-600 rounded-xl hover:bg-sky-500 hover:shadow-lg hover:shadow-sky-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 focus:ring-offset-slate-900">
+                    Acessar Plataforma
+                    <svg class="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </a>
+            </div>
         </div>
     </div>
 
-    <footer class="mt-8 text-gray-400 text-sm animate-fade-in-up delay-4">
-        <p>Versão 0.1 | Projeto Open-Source</p>
+    <footer class="mt-12 text-slate-500 text-sm font-medium">
+        <p>Versão 0.1 • Open Source</p>
     </footer>
 
 </body>

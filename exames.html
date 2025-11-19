@@ -5,25 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil | Exames</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
     <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
-        <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+        <div class="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:gap-6">
             <a href="index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
-            <div class="hidden md:flex items-center gap-2 text-sm font-semibold">
-                <a href="index.html" class="nav-link text-slate-100/80">Home</a>
-                <a href="exames.html" class="nav-link text-white">Exames</a>
-                <a href="escalas/index.html" class="nav-link text-slate-100/80">Escalas</a>
-                <a href="prescricoes/index.html" class="nav-link text-slate-100/80">Prescrições</a>
-                <a href="#" onclick="openHelpModal()" class="nav-link text-slate-100/80">Ajuda</a>
+            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold w-full md:flex-1 md:justify-center md:flex-nowrap">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="exames.html" class="nav-link active">Exames</a>
+                <a href="escalas/index.html" class="nav-link">Escalas</a>
+                <a href="prescricoes/index.html" class="nav-link">Prescrições</a>
+                <a href="#" onclick="openHelpModal()" class="nav-link">Ajuda</a>
             </div>
-            <div class="flex flex-wrap items-center gap-2 bg-white/5 rounded-2xl px-3 py-2 border border-white/10">
-                <button id="export-button" class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition" >Exportar</button>
-                <label class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition cursor-pointer">
+            <div class="flex flex-wrap items-center justify-end gap-1.5 bg-white/5 rounded-2xl px-3 py-2 border border-white/10 w-full md:w-auto md:flex-nowrap md:justify-end">
+                <button id="editModeToggleBtn" type="button" class="edit-mode-toggle" aria-pressed="false">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span class="toggle-label">Modo edição</span>
+                    <span class="state-text" aria-live="polite">OFF</span>
+                </button>
+                <button id="export-button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:text-black hover:shadow-md transition">Exportar</button>
+                <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md hover:text-black transition cursor-pointer">
                     Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
                 </label>
-                <button class="px-4 py-2 text-sm font-semibold rounded-xl bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
+                <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset</button>
             </div>
         </div>
     </nav>
@@ -95,7 +101,7 @@
                     <div class="modal-content p-6">
                         <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                             <h3 id="findingModalTitle" class="text-xl font-bold">Adicionar/Editar Achado</h3>
-                            <span class="close" onclick="closeFindingModal()">&times;</span>
+                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeFindingModal()">&times;</button>
                         </div>
                         
                         <div class="space-y-4">
@@ -155,7 +161,7 @@
                     <div class="modal-content p-6">
                         <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                             <h3 class="text-xl font-bold">Informações sobre o Achado</h3>
-                            <span class="close" onclick="closeInfoModal()">&times;</span>
+                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeInfoModal()">&times;</button>
                         </div>
                         <div id="infoModalContent" class="prose dark:prose-invert max-w-none"></div>
                     </div>
@@ -165,32 +171,42 @@
                     <div class="modal-content p-6">
                         <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                             <h3 class="text-xl font-bold">Como Usar o Prontuário Fácil</h3>
-                            <span class="close" onclick="closeHelpModal()">&times;</span>
+                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeHelpModal()">&times;</button>
                         </div>
-                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none">
-                            <h4>Passo 1: Selecione os Exames</h4>
-                            <p>Na tela inicial, clique nos roteiros de examinação que deseja incluir na sua consulta. Os exames selecionados ficarão destacados. Você pode adicionar seus próprios exames customizados clicando em "Adicionar Novo Exame" (não recomendamos).</p>
+                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none text-slate-300">
+                            <p class="mb-4 text-lg">O módulo de <strong>Exames Físicos</strong> permite a documentação rápida e padronizada de achados clínicos.</p>
                             
-                            <h4>Passo 2: Registre os Achados</h4>
-                            <p>Após selecionar os exames e clicar em "Prosseguir", você verá uma lista de seções e perguntas para cada exame. Clique nos botões (ex: "Sim", "Não") para registrar suas observações. Para perguntas de texto (como Sinais Vitais), basta digitar o valor no campo correspondente.</p>
-                            <p>À direita, um painel de pré-visualização mostrará o laudo sendo montado em tempo real.</p>
-                            
-                            <h4>Passo 3: Gere e Copie o Laudo</h4>
-                            <p>Quando terminar de registrar os achados, clique em "Gerar Laudo". O texto final será apresentado. Você pode então clicar em "Copiar" para transferir o laudo para a área de transferência e colar onde precisar.</p>
-            
-                            <hr class="my-4">
-            
-                            <h4>Recursos Adicionais:</h4>
-                            <ul class="list-disc pl-5">
-                                <li><strong>Adicionar Achados:</strong> Dentro de um exame, na tela de registro, você pode adicionar perguntas customizadas (achados) a qualquer seção clicando no botão "+".</li>
-                                <li><strong>Importar/Exportar:</strong> Use os botões no cabeçalho para salvar ("Exportar") suas configurações de exames e achados customizados em um arquivo. Você pode carregar ("Importar") esse arquivo em outro computador ou navegador para ter seus dados sempre à mão.</li>
-                                <li><strong>Limpar Sessão:</strong> Este botão apaga os exames e achados selecionados na sua sessão atual, permitindo começar um novo laudo do zero.</li>
-                            </ul>
+                            <div class="space-y-4">
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                        Seleção de Roteiros
+                                    </h4>
+                                    <p class="text-sm">Escolha os sistemas ou regiões que deseja examinar (ex: Cardiovascular, Respiratório). Você pode selecionar múltiplos roteiros simultaneamente para compor um exame completo.</p>
+                                </div>
+
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                        Registro de Achados
+                                    </h4>
+                                    <p class="text-sm">Responda às perguntas de cada seção. O sistema suporta respostas rápidas (Sim/Não) e campos de texto livre para dados quantitativos (ex: Sinais Vitais). O laudo é montado em tempo real.</p>
+                                </div>
+
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                                        Personalização
+                                    </h4>
+                                    <p class="text-sm">Você pode adicionar novos achados ou perguntas específicas a qualquer momento, além de criar seus próprios roteiros de exame personalizados para uso futuro.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="dadosnativos.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
@@ -208,4 +224,3 @@
     </script>
 </body>
 </html>
-            

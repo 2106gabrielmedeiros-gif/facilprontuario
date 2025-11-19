@@ -4,13 +4,16 @@ let findingsState = {};
 let customExams = {};
 let customAdditions = {};
 let likelihoodData = {};
+let editModeEnabled = false;
 
 // ======== INICIALIZAÇÃO ========
 document.addEventListener('DOMContentLoaded', function() {
     loadCustomData();
+    loadEditModePreference();
     renderExamSelection();
     loadSessionState();
     setupTheme();
+    initializeEditModeToggle();
     const panel = document.getElementById('previewPanel');
     const btn = document.getElementById('togglePreviewBtn');
     if (panel && btn) {
@@ -21,16 +24,62 @@ document.addEventListener('DOMContentLoaded', function() {
         positionPreviewToggle();
         window.addEventListener('resize', positionPreviewToggle);
     }
+
+    const exportBtn = document.getElementById('export-button');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => exportData('exams'));
+    }
 });
+
+function loadEditModePreference() {
+    const stored = localStorage.getItem('editModeEnabled');
+    editModeEnabled = stored ? JSON.parse(stored) : false;
+    document.body?.classList.toggle('edit-mode-active', editModeEnabled);
+}
+
+function initializeEditModeToggle() {
+    const toggleBtn = document.getElementById('editModeToggleBtn');
+    if (!toggleBtn) return;
+    updateEditModeToggleUI(toggleBtn);
+    toggleBtn.addEventListener('click', () => {
+        editModeEnabled = !editModeEnabled;
+        localStorage.setItem('editModeEnabled', JSON.stringify(editModeEnabled));
+        document.body?.classList.toggle('edit-mode-active', editModeEnabled);
+        updateEditModeToggleUI(toggleBtn);
+        if (document.getElementById('findingsContainer')) {
+            renderFindings();
+        }
+    });
+}
+
+function updateEditModeToggleUI(btn) {
+    const stateLabel = btn.querySelector('.state-text');
+    if (stateLabel) {
+        stateLabel.textContent = editModeEnabled ? 'ON' : 'OFF';
+    }
+    btn.setAttribute('aria-pressed', editModeEnabled ? 'true' : 'false');
+    btn.classList.toggle('edit-mode-active', editModeEnabled);
+}
+
+function requireEditMode() {
+    if (editModeEnabled) return true;
+    showToast('Ative o modo edição para alterar ou adicionar achados.', 'warning');
+    return false;
+}
 
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
 function proceedToExam() {
-    if (selectedExams.length === 0) {
-        alert('Selecione pelo menos um exame.');
-        return;
+    try {
+        if (selectedExams.length === 0) {
+            showToast('Selecione pelo menos um exame.', 'warning');
+            return;
+        }
+        renderFindings();
+        showScreen('screen2');
+    } catch (error) {
+        console.error('Erro ao prosseguir:', error);
+        showToast('Erro ao carregar exames. Verifique o console.', 'error');
     }
-    renderFindings();
-    showScreen('screen2');
 }
 
 function backToSelection() {
@@ -137,7 +186,7 @@ function newExam() { selectedExams = []; findingsState = {}; masterReset(); show
 function copyToClipboard() {
     let reportText = generateReportText();
     reportText = reportText.replace(/\*\*/g, '');
-    navigator.clipboard.writeText(reportText).then(() => alert('Copiado!'));
+    navigator.clipboard.writeText(reportText).then(() => showToast('Copiado!', 'success'));
 }
 
 // ======== LÓGICA DE DADOS (MERGE E BUSCA) ========
@@ -152,7 +201,9 @@ function getExamWithAdditions(examId) {
         if (!merged.findings[catKey]) {
             merged.findings[catKey] = { name: addCat.name || 'Categoria Personalizada', items: [] };
         }
-        merged.findings[catKey].items.push(...addCat.items);
+        if (Array.isArray(addCat.items)) {
+            merged.findings[catKey].items.push(...addCat.items);
+        }
     });
     return merged;
 }
@@ -160,12 +211,14 @@ function getExamWithAdditions(examId) {
 function findFindingById(id) {
     const allExams = { ...examsData, ...customExams };
     for (const exam of Object.values(allExams)) {
+        if (!exam.findings) continue;
         for (const cat of Object.values(exam.findings)) {
             const f = (cat.items || []).find(i => i.id === id);
             if (f) return f;
         }
     }
     for (const examId in customAdditions) {
+        if (!customAdditions[examId]) continue;
         for (const cat of Object.values(customAdditions[examId])) {
             const f = (cat.items || []).find(i => i.id === id);
             if (f) return f;
@@ -180,22 +233,147 @@ function renderExamSelection() {
     grid.innerHTML = '';
     const allExams = { ...examsData, ...customExams };
     const filterText = (document.getElementById('examSearchInput')?.value || '').toLowerCase();
-    const filtered = Object.values(allExams).filter(exam => exam.name.toLowerCase().includes(filterText)).sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Ordenação: Customizados primeiro, depois alfabético
+    const filtered = Object.values(allExams).filter(exam => exam.name.toLowerCase().includes(filterText))
+        .sort((a, b) => {
+            const aCustom = a.id.startsWith('custom_');
+            const bCustom = b.id.startsWith('custom_');
+            if (aCustom && !bCustom) return -1;
+            if (!aCustom && bCustom) return 1;
+            return a.name.localeCompare(b.name);
+        });
+
     filtered.forEach(exam => {
         const card = document.createElement('div');
         card.className = 'exam-card';
+        card.dataset.id = exam.id;
         if (selectedExams.includes(exam.id)) card.classList.add('selected');
         const isCustom = exam.id.startsWith('custom_');
-        card.innerHTML = `<h3>${exam.name}</h3><p>${exam.description}</p>${isCustom ? `<div class="exam-actions"><button class="icon-btn edit" onclick="openEditExamForm('${exam.id}')" title="Editar">✎</button><button class="icon-btn delete" onclick="deleteExam('${exam.id}')" title="Deletar">×</button></div>` : ''}`;
-        card.onclick = (e) => { if (!e.target.closest('.exam-actions')) toggleExamSelection(exam.id); };
+        
+        card.innerHTML = `
+            ${isCustom && editModeEnabled ? '<div class="drag-handle">⋮⋮</div>' : ''}
+            <div class="item-content">
+                <h3>${exam.name}</h3>
+                <p>${exam.description}</p>
+            </div>
+            ${isCustom ? `<div class="exam-actions">
+                <button class="icon-btn edit" onclick="openEditExamDrawer('${exam.id}', event)" title="Editar">✎</button>
+                <button class="icon-btn delete" onclick="deleteExam('${exam.id}', event)" title="Deletar">×</button>
+            </div>` : ''}
+        `;
+        card.onclick = (e) => { 
+            if (!e.target.closest('.exam-actions') && !e.target.closest('.drag-handle')) toggleExamSelection(exam.id); 
+        };
         grid.appendChild(card);
     });
+
+    // Inicializa Sortable apenas se estiver no modo edição e houver itens customizados
+    if (editModeEnabled && filtered.some(e => e.id.startsWith('custom_')) && typeof Sortable !== 'undefined') {
+        new Sortable(grid, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            onEnd: function (evt) {
+                // Lógica de reordenação (se necessário salvar a ordem customizada)
+                // Por enquanto, a ordem é alfabética/tipo, mas podemos implementar ordem manual depois
+            }
+        });
+    }
 }
+
 function toggleExamSelection(examId) { const index = selectedExams.indexOf(examId); if (index > -1) { selectedExams.splice(index, 1); } else { selectedExams.push(examId); } renderExamSelection(); }
 
-// ======== TELA 2: RENDERIZAÇÃO DOS ACHADOS ========
+// ======== DRAWER DE EDIÇÃO DE EXAME ========
+function openEditExamDrawer(examId, event) {
+    if(event) event.stopPropagation();
+    const exam = customExams[examId];
+    if (!exam) return;
+
+    const content = `
+        <div class="form-group">
+            <label for="drawerExamName" class="block mb-1 font-semibold">Nome do Exame</label>
+            <input type="text" id="drawerExamName" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" value="${exam.name}">
+        </div>
+        <div class="form-group mt-4">
+            <label for="drawerExamDesc" class="block mb-1 font-semibold">Descrição</label>
+            <textarea id="drawerExamDesc" rows="3" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white">${exam.description}</textarea>
+        </div>
+    `;
+
+    openDrawer('Editar Exame', content, () => {
+        const name = document.getElementById('drawerExamName').value.trim();
+        const desc = document.getElementById('drawerExamDesc').value.trim();
+        
+        if (!name || !desc) {
+            showToast('Nome e descrição são obrigatórios.', 'error');
+            return;
+        }
+
+        customExams[examId].name = name;
+        customExams[examId].description = desc;
+        saveCustomData();
+        renderExamSelection();
+        closeDrawer();
+        showToast('Exame atualizado com sucesso!', 'success');
+    });
+}
+
+function toggleAddExamForm() {
+    // Substituído pelo Drawer
+    const content = `
+        <div class="form-group">
+            <label for="drawerNewExamName" class="block mb-1 font-semibold">Nome do Exame</label>
+            <input type="text" id="drawerNewExamName" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" placeholder="Ex: Exame Neurológico">
+        </div>
+        <div class="form-group mt-4">
+            <label for="drawerNewExamDescription" class="block mb-1 font-semibold">Descrição</label>
+            <textarea id="drawerNewExamDescription" rows="3" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" placeholder="Breve descrição do roteiro..."></textarea>
+        </div>
+    `;
+
+    openDrawer('Novo Exame', content, () => {
+        const nameInput = document.getElementById('drawerNewExamName');
+        const descInput = document.getElementById('drawerNewExamDescription');
+        
+        const name = nameInput ? nameInput.value.trim() : '';
+        const desc = descInput ? descInput.value.trim() : '';
+        
+        if (!name || !desc) {
+            showToast('Nome e descrição são obrigatórios.', 'error');
+            return;
+        }
+
+        const id = 'custom_' + Date.now();
+        customExams[id] = { 
+            id, 
+            name, 
+            description: desc, 
+            findings: { 
+                personalizado: { name: "Personalizado", items: [] } 
+            } 
+        };
+        saveCustomData();
+        renderExamSelection();
+        closeDrawer();
+        showToast('Exame criado com sucesso!', 'success');
+    });
+}
+
+function deleteExam(examId, event) { 
+    if(event) event.stopPropagation();
+    if(confirm('Deletar este exame e todos os seus achados?')){ 
+        delete customExams[examId]; 
+        selectedExams = selectedExams.filter(id => id !== examId); 
+        saveCustomData(); 
+        renderExamSelection(); 
+        showToast('Exame deletado.', 'info');
+    }
+}
 function renderFindings() {
     const container = document.getElementById('findingsContainer');
+    if (!container) return;
     container.innerHTML = '';
     selectedExams.forEach(examId => {
         const exam = getExamWithAdditions(examId);
@@ -205,14 +383,39 @@ function renderFindings() {
         systemSection.className = 'system-section';
         const header = document.createElement('div');
         header.className = 'system-header';
-        header.innerHTML = `${exam.name}<div class="system-actions">${isCustomExam ? `<button class="btn btn-secondary btn-small" onclick="addCategory('${examId}')">+ Seção</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}')">+ Achado</button></div>`;
+
+        const actions = [];
+        if (editModeEnabled && isCustomExam) {
+            actions.push(`<button class="btn btn-secondary btn-small" onclick="addCategory('${examId}')">+ Seção</button>`);
+        }
+        if (editModeEnabled) {
+            actions.push(`<button class="btn btn-success btn-small" onclick="openFindingDrawer('${examId}')">+ Achado</button>`);
+        }
+        const actionsHtml = actions.length ? `<div class="system-actions">${actions.join('')}</div>` : '';
+        header.innerHTML = `${exam.name}${actionsHtml}`;
         systemSection.appendChild(header);
-        Object.entries(exam.findings).forEach(([categoryKey, category]) => {
+        
+        if (exam.findings) {
+            Object.entries(exam.findings).forEach(([categoryKey, category]) => {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'finding-group';
             const groupTitle = document.createElement('h4');
-            groupTitle.innerHTML = `<span>${category.name}</span><div class="category-actions">${isCustomExam ? `<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button><button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>` : ''}<button class="btn btn-success btn-small" onclick="openFindingModal('${examId}','${categoryKey}')">+</button></div>`;
+            let categoryActions = '';
+            if (editModeEnabled) {
+                const catButtons = [];
+                if (isCustomExam) {
+                    catButtons.push(`<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button>`);
+                    catButtons.push(`<button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>`);
+                }
+                catButtons.push(`<button class="btn btn-success btn-small" onclick="openFindingDrawer('${examId}','${categoryKey}')">+</button>`);
+                categoryActions = `<div class="category-actions">${catButtons.join('')}</div>`;
+            }
+            groupTitle.innerHTML = `<span>${category.name}</span>${categoryActions}`;
             groupDiv.appendChild(groupTitle);
+
+            const findingsList = document.createElement('div');
+            findingsList.className = 'findings-list';
+            groupDiv.appendChild(findingsList);
 
             const originalItems = category.items || [];
             const sortedItems = reorderFindings(originalItems);
@@ -227,19 +430,30 @@ function renderFindings() {
 
                 const stateObj = findingsState[finding.id];
                 const hasSelection = stateObj && (stateObj.answerId !== undefined || stateObj.value);
+                const isCustomFinding = finding.id.startsWith('custom_');
 
                 const findingWrapper = document.createElement('div');
                 findingWrapper.className = 'finding-item';
                 findingWrapper.id = `finding-item-${finding.id}`;
+                findingWrapper.dataset.id = finding.id;
+                
                 if (hasSelection) findingWrapper.classList.add('has-selection');
+                if (finding.displayCondition) findingWrapper.classList.add('conditional');
 
-                if (finding.displayCondition) {
-                    findingWrapper.classList.add('conditional');
+                // Drag Handle
+                if (editModeEnabled && (isCustomExam || isCustomFinding)) {
+                    const handle = document.createElement('div');
+                    handle.className = 'drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    findingWrapper.appendChild(handle);
                 }
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'item-content';
 
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'finding-question';
-
+                
                 const questionLabel = document.createElement('span');
                 questionLabel.textContent = finding.question;
                 questionDiv.appendChild(questionLabel);
@@ -252,10 +466,11 @@ function renderFindings() {
                     infoBtn.textContent = 'ⓘ';
                     infoBtn.onclick = (event) => {
                         event.stopPropagation();
-                        showInfoModal(finding.id);
+                        showInfoDrawer(finding.id);
                     };
                     questionDiv.appendChild(infoBtn);
                 }
+                contentDiv.appendChild(questionDiv);
 
                 const controlsDiv = document.createElement('div');
                 controlsDiv.className = 'finding-controls';
@@ -276,38 +491,45 @@ function renderFindings() {
 
                         const btn = document.createElement('button');
                         btn.className = 'toggle-button';
+                        if (answer.isNegative) btn.classList.add('negative');
                         btn.textContent = answer.text;
                         if (stateObj && stateObj.answerId === answer.id) {
                             btn.classList.add('active');
                         }
                         btn.onclick = () => selectAnswer(finding.id, answer.id);
-
-                        const addBtn = document.createElement('button');
-                        addBtn.className = 'add-conditional-btn';
-                        addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
-                        addBtn.innerHTML = '+';
-                        addBtn.onclick = (e) => {
-                            e.stopPropagation();
-                            openConditionalFindingModal(exam.id, categoryKey, finding.id, answer.id);
-                        };
-
                         wrapper.appendChild(btn);
-                        wrapper.appendChild(addBtn);
+
+                        if (editModeEnabled) {
+                            const addBtn = document.createElement('button');
+                            addBtn.className = 'add-conditional-btn';
+                            addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
+                            addBtn.innerHTML = '+';
+                            addBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                openConditionalFindingDrawer(examId, categoryKey, finding.id, answer.id);
+                            };
+                            wrapper.appendChild(addBtn);
+                        }
                         controlsDiv.appendChild(wrapper);
                     });
                 }
 
-                if (finding.id.startsWith('custom_')) {
+                if (editModeEnabled && isCustomFinding) {
                     const editBtn = document.createElement('button');
-                    editBtn.className = 'icon-btn edit'; editBtn.innerHTML = '✎'; editBtn.title = 'Editar achado';
-                    editBtn.onclick = () => openEditFindingModal(exam.id, categoryKey, finding.id);
+                    editBtn.className = 'icon-btn edit';
+                    editBtn.innerHTML = '✎';
+                    editBtn.title = 'Editar achado';
+                    editBtn.onclick = () => openFindingDrawer(examId, categoryKey, finding.id);
                     controlsDiv.appendChild(editBtn);
                 }
 
-                const detailContainer = document.createElement('div');
-                detailContainer.className = 'finding-detail-container';
+                contentDiv.appendChild(controlsDiv);
 
+                // Detalhes adicionais
+                let detailContainer = null;
                 if (finding.type !== 'open-text') {
+                    detailContainer = document.createElement('div');
+                    detailContainer.className = 'finding-detail-container';
                     const detailInputId = `detail-${finding.id}`;
                     const detailLabel = document.createElement('label');
                     detailLabel.className = 'detail-label';
@@ -317,6 +539,7 @@ function renderFindings() {
                     const detailInput = document.createElement('input');
                     detailInput.type = 'text';
                     detailInput.id = detailInputId;
+
                     detailInput.className = 'finding-detail-input';
                     detailInput.placeholder = 'Adicionar detalhes (opcional)';
                     detailInput.value = stateObj?.detail || '';
@@ -328,11 +551,27 @@ function renderFindings() {
 
                 findingWrapper.appendChild(questionDiv);
                 findingWrapper.appendChild(controlsDiv);
-                findingWrapper.appendChild(detailContainer);
-                groupDiv.appendChild(findingWrapper);
+                if (detailContainer) {
+                    findingWrapper.appendChild(detailContainer);
+                }
+                findingsList.appendChild(findingWrapper);
             });
+
+            if (editModeEnabled && typeof Sortable !== 'undefined') {
+                new Sortable(findingsList, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        const newOrderIds = Array.from(findingsList.children).map(el => el.dataset.id);
+                        updateFindingsOrder(examId, categoryKey, newOrderIds);
+                    }
+                });
+            }
             systemSection.appendChild(groupDiv);
         });
+        }
         container.appendChild(systemSection);
     });
     updatePreview();
@@ -353,7 +592,7 @@ function openConditionalFindingModal(examId, categoryKey, triggerFindingId, trig
         triggerFindingId: triggerFindingId,
         triggerAnswerId: triggerAnswerId
     };
-    openFindingModal(examId, categoryKey, condition);
+    openFindingDrawer(examId, categoryKey, condition);
 }
 
 function saveFindingDetail(event, findingId) {
@@ -374,175 +613,181 @@ function saveOpenTextAnswer(findingId, value) {
     saveSessionState();
 }
 
-// ======== MODAIS (ADICIONAR/EDITAR) ========
-function addAnswerField(text = '', description = '', isNegative = false) {
-    const container = document.getElementById('answersContainer');
+// ======== DRAWER DE ACHADOS (ADICIONAR/EDITAR) ========
+
+function addDrawerAnswerField(text = '', description = '', isNegative = false) {
+    const container = document.getElementById('drawerAnswersContainer');
+    if (!container) return;
+    
     const div = document.createElement('div');
-    div.className = 'answer-input-group';
-    div.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px;';
+    div.className = 'answer-input-group flex gap-2 items-center bg-gray-700 p-2 rounded mb-2';
     
-    const textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.value = text;
-    textInput.placeholder = 'Texto do Botão';
-    textInput.className = 'answer-text';
-
-    const descInput = document.createElement('input');
-    descInput.type = 'text'; descInput.value = description; descInput.placeholder = 'Texto para o Laudo (Descrição)'; descInput.className = 'answer-description';
-
-    const negativeWrapper = document.createElement('label');
-    negativeWrapper.style.cssText = 'display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap;';
-    const negativeCheckbox = document.createElement('input');
-    negativeCheckbox.type = 'checkbox';
-    negativeCheckbox.className = 'answer-is-negative';
-    negativeCheckbox.checked = isNegative;
-    negativeWrapper.appendChild(negativeCheckbox);
-    negativeWrapper.appendChild(document.createTextNode('Achado negativo?'));
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-danger btn-small';
-    removeBtn.textContent = '×';
-    removeBtn.onclick = () => div.remove();
-    
-    div.appendChild(textInput);
-    div.appendChild(descInput);
-    div.appendChild(negativeWrapper);
-    div.appendChild(removeBtn);
+    div.innerHTML = `
+        <div class="flex-1">
+            <input type="text" class="answer-text w-full p-1 bg-gray-800 border border-gray-600 rounded text-white text-sm mb-1" placeholder="Botão (Ex: Sim)" value="${text}">
+            <input type="text" class="answer-description w-full p-1 bg-gray-800 border border-gray-600 rounded text-white text-sm" placeholder="Texto do Laudo" value="${description}">
+        </div>
+        <div class="flex items-center gap-1" title="Marcar como achado negativo (normal)">
+            <input type="checkbox" class="answer-is-negative w-4 h-4" ${isNegative ? 'checked' : ''}>
+            <span class="text-xs text-gray-300">Neg.</span>
+        </div>
+        <button class="text-red-400 hover:text-red-300 font-bold px-2 text-lg" onclick="this.parentElement.remove()">×</button>
+    `;
     container.appendChild(div);
 }
 
-function openFindingModal(examId, categoryKey = null, condition = null) {
-    const modal = document.getElementById('findingModal');
-    delete modal.dataset.condition;
-
-    document.getElementById('findingType').value = 'multiple-choice';
-    document.getElementById('findingQuestion').value = '';
-    document.getElementById('findingReportLabel').value = '';
-    document.getElementById('answersContainer').innerHTML = '';
-    document.getElementById('findingInfo').value = '';
-    addAnswerField('Sim', '');
-    addAnswerField('Não', '', true);
-    document.getElementById('findingModalTitle').textContent = 'Adicionar Novo Achado';
-    document.getElementById('saveFindingBtn').onclick = () => saveFinding({ examId, categoryKey });
-
-    const conditionalCheckbox = document.getElementById('conditionalCheckbox');
-    const conditionalControls = document.getElementById('conditionalControls');
-    conditionalCheckbox.checked = false;
-    conditionalControls.classList.add('hidden');
-
-    if (condition) {
-        modal.dataset.condition = JSON.stringify(condition);
-        document.getElementById('findingModalTitle').textContent = 'Adicionar Achado Condicional';
-        conditionalCheckbox.checked = true;
-        conditionalControls.classList.remove('hidden');
-
-        const triggerFindingSelect = document.getElementById('triggerFindingSelect');
-        const triggerAnswerSelect = document.getElementById('triggerAnswerSelect');
-
-        triggerFindingSelect.innerHTML = '';
-        triggerAnswerSelect.innerHTML = '';
-
-        const parentFinding = findFindingById(condition.triggerFindingId);
-        if (parentFinding) {
-            const findingOption = new Option(parentFinding.question, parentFinding.id, true, true);
-            triggerFindingSelect.add(findingOption);
-
-            const triggerAnswer = (parentFinding.answers || []).find(a => a.id === condition.triggerAnswerId);
-            if (triggerAnswer) {
-                const answerOption = new Option(triggerAnswer.text, triggerAnswer.id, true, true);
-                triggerAnswerSelect.add(answerOption);
-            }
-        }
-
-        triggerFindingSelect.disabled = true;
-        triggerAnswerSelect.disabled = true;
+function toggleDrawerFindingType() {
+    const type = document.getElementById('drawerFindingType').value;
+    const answersSection = document.getElementById('drawerAnswersSection');
+    const openTextSection = document.getElementById('drawerOpenTextSection');
+    
+    if (type === 'open-text') {
+        answersSection.classList.add('hidden');
+        openTextSection.classList.remove('hidden');
     } else {
-        document.getElementById('triggerFindingSelect').innerHTML = '<option>--Selecione--</option>';
-        document.getElementById('triggerAnswerSelect').innerHTML = '<option>--Selecione--</option>';
-        document.getElementById('triggerFindingSelect').disabled = false;
-        document.getElementById('triggerAnswerSelect').disabled = false;
+        answersSection.classList.remove('hidden');
+        openTextSection.classList.add('hidden');
+    }
+}
+
+function openFindingDrawer(examId, categoryKey, findingIdOrCondition = null) {
+    if (!requireEditMode()) return;
+
+    const isEdit = typeof findingIdOrCondition === 'string';
+    const condition = (typeof findingIdOrCondition === 'object') ? findingIdOrCondition : null;
+    const findingId = isEdit ? findingIdOrCondition : null;
+
+    let finding = isEdit ? findFindingById(findingId) : null;
+    
+    // Default values
+    let question = finding ? finding.question : '';
+    let info = finding ? (finding.info || '') : '';
+    let type = finding ? finding.type : 'yes-no';
+    let reportLabel = finding ? (finding.reportLabel || '') : '';
+    let answers = finding ? (finding.answers || []) : [];
+
+    // If new and not open-text, add default answers
+    if (!isEdit && !finding && type !== 'open-text') {
+        answers = [
+            { text: 'Sim', description: '', isNegative: false },
+            { text: 'Não', description: '', isNegative: true }
+        ];
     }
 
-    updateFindingModalUI();
-    modal.style.display = 'flex';
+    const content = `
+        <div class="form-group">
+            <label class="block mb-1 font-semibold text-sm">Pergunta / Nome do Achado</label>
+            <input type="text" id="drawerFindingQuestion" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" value="${question}" placeholder="Ex: Reflexo Patelar">
+        </div>
+
+        <div class="form-group mt-4">
+            <label class="block mb-1 font-semibold text-sm">Tipo de Resposta</label>
+            <select id="drawerFindingType" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" onchange="toggleDrawerFindingType()">
+                <option value="yes-no" ${type === 'yes-no' ? 'selected' : ''}>Sim / Não (Binário)</option>
+                <option value="multiple-choice" ${type === 'multiple-choice' ? 'selected' : ''}>Múltipla Escolha</option>
+                <option value="open-text" ${type === 'open-text' ? 'selected' : ''}>Texto Aberto</option>
+            </select>
+        </div>
+
+        <div id="drawerAnswersSection" class="${type === 'open-text' ? 'hidden' : ''} mt-4">
+            <label class="block mb-1 font-semibold text-sm">Opções de Resposta</label>
+            <div id="drawerAnswersContainer" class="space-y-2 mb-2"></div>
+            <button class="btn btn-secondary btn-small w-full" onclick="addDrawerAnswerField()">+ Adicionar Opção</button>
+        </div>
+
+        <div id="drawerOpenTextSection" class="${type === 'open-text' ? '' : 'hidden'} mt-4">
+            <label class="block mb-1 font-semibold text-sm">Etiqueta para o Laudo</label>
+            <input type="text" id="drawerReportLabel" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" value="${reportLabel}" placeholder="Ex: Observações:">
+        </div>
+
+        <div class="form-group mt-4">
+            <label class="block mb-1 font-semibold text-sm">Informações Extras (Tooltip)</label>
+            <textarea id="drawerFindingInfo" rows="2" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" placeholder="Texto de ajuda que aparece ao clicar no ícone (i)">${info}</textarea>
+        </div>
+        
+        ${condition ? `<div class="mt-4 p-2 bg-blue-900/30 border border-blue-500/50 rounded text-xs text-blue-200">
+            Este é um achado condicional. Aparecerá apenas quando a condição for atendida.
+        </div>` : ''}
+    `;
+
+    openDrawer(isEdit ? 'Editar Achado' : 'Novo Achado', content, () => {
+        saveDrawerFinding(examId, categoryKey, findingId, condition);
+    });
+
+    // Post-render initialization
+    setTimeout(() => {
+        const container = document.getElementById('drawerAnswersContainer');
+        if (container && answers.length > 0) {
+            answers.forEach(ans => addDrawerAnswerField(ans.text, ans.description, ans.isNegative));
+        }
+    }, 0);
 }
 
-function openEditExamForm(examId) {
-    const exam = customExams[examId];
-    if (!exam) return;
-    document.getElementById('newExamName').value = exam.name;
-    document.getElementById('newExamDescription').value = exam.description;
-    document.getElementById('examFormTitle').textContent = 'Editar Exame';
-    document.getElementById('saveExamBtn').textContent = 'Salvar Alterações';
-    document.getElementById('saveExamBtn').onclick = () => saveExamChanges(examId);
-    document.getElementById('addExamForm').classList.remove('hidden');
-}
+function saveDrawerFinding(examId, categoryKey, findingId, condition) {
+    const question = document.getElementById('drawerFindingQuestion').value.trim();
+    const type = document.getElementById('drawerFindingType').value;
+    const info = document.getElementById('drawerFindingInfo').value.trim();
+    
+    if (!question) { showToast('A pergunta é obrigatória.', 'error'); return; }
 
-function openEditFindingModal(examId, categoryKey, findingId) {
-    let currentFinding = { examId, categoryKey, findingId };
-    const finding = findFindingById(findingId);
-    if (!finding) return;
-    document.getElementById('findingQuestion').value = finding.question;
-    document.getElementById('findingInfo').value = finding.info || '';
-    const answersContainer = document.getElementById('answersContainer');
-    answersContainer.innerHTML = '';
-    (finding.answers || []).forEach(ans => addAnswerField(ans.text, ans.description, ans.isNegative));
-    document.getElementById('findingModalTitle').textContent = 'Editar Achado';
-    document.getElementById('saveFindingBtn').onclick = () => saveFindingChanges(currentFinding);
-    document.getElementById('findingModal').style.display = 'flex';
-}
-
-function closeFindingModal() {
-    const modal = document.getElementById('findingModal');
-    delete modal.dataset.condition;
-    modal.style.display = 'none';
-}
-
-function saveFinding(currentFinding) {
-    const { examId, categoryKey } = currentFinding;
-    const type = document.getElementById('findingType').value;
-    const question = document.getElementById('findingQuestion').value.trim();
-    const info = document.getElementById('findingInfo').value.trim();
-    const reportLabel = document.getElementById('findingReportLabel').value.trim();
-
-    if (!question) return alert('A pergunta é obrigatória.');
-
-    let newFinding;
+    let newFinding = {
+        id: findingId || ('custom_' + Date.now()),
+        question,
+        type,
+        info
+    };
 
     if (type === 'open-text') {
-        if (!reportLabel) return alert('A etiqueta para o laudo é obrigatória para perguntas de texto aberto.');
-        newFinding = { id: 'custom_' + Date.now(), question, type: 'open-text', reportLabel, info };
+        const reportLabel = document.getElementById('drawerReportLabel').value.trim();
+        if (!reportLabel) { showToast('A etiqueta para o laudo é obrigatória.', 'error'); return; }
+        newFinding.reportLabel = reportLabel;
     } else {
-        const answerGroups = document.querySelectorAll('#answersContainer .answer-input-group');
-        if (answerGroups.length === 0) return alert('Respostas são obrigatórias.');
-        const answers = Array.from(answerGroups).map(div => ({
-            id: `ans_${Date.now()}_${Math.random()}`,
-            text: div.querySelector('.answer-text').value.trim(),
-            description: div.querySelector('.answer-description').value.trim(),
-            isNegative: div.querySelector('.answer-is-negative').checked
-        })).filter(ans => ans.text);
-        if (answers.length === 0) return alert('Preencha o texto de pelo menos uma resposta.');
-        newFinding = {
-            id: 'custom_' + Date.now(), question, answers, info,
-            type: answers.length > 2 || answers.some(a => !['sim', 'não'].includes(a.text.toLowerCase())) ? 'multiple-choice' : 'yes-no'
-        };
+        const groups = document.querySelectorAll('#drawerAnswersContainer .answer-input-group');
+        const answers = Array.from(groups).map(g => ({
+            id: 'ans_' + Math.random().toString(36).substr(2, 9),
+            text: g.querySelector('.answer-text').value.trim(),
+            description: g.querySelector('.answer-description').value.trim(),
+            isNegative: g.querySelector('.answer-is-negative').checked
+        })).filter(a => a.text);
+        
+        if (answers.length === 0) { showToast('Adicione pelo menos uma resposta.', 'error'); return; }
+        newFinding.answers = answers;
+        // Auto-detect type based on answers if not explicitly open-text
+        if (type !== 'open-text') {
+            newFinding.type = (answers.length > 2 || answers.some(a => !['sim', 'não'].includes(a.text.toLowerCase()))) ? 'multiple-choice' : 'yes-no';
+        }
     }
 
-    const modal = document.getElementById('findingModal');
-    if (modal.dataset.condition) {
-        newFinding.displayCondition = JSON.parse(modal.dataset.condition);
+    if (condition) newFinding.displayCondition = condition;
+
+    if (findingId) {
+        // Update existing
+        const finding = findFindingById(findingId);
+        if (finding) {
+            Object.assign(finding, newFinding);
+        }
+    } else {
+        // Insert new
+        insertNewFinding(examId, categoryKey, newFinding);
     }
 
-    const insertFinding = (itemsArray, findingToInsert) => {
-        if (findingToInsert.displayCondition) {
-            const parentId = findingToInsert.displayCondition.triggerFindingId;
+    saveCustomData();
+    renderFindings();
+    closeDrawer();
+    showToast('Achado salvo com sucesso!', 'success');
+}
+
+function insertNewFinding(examId, categoryKey, newFinding) {
+    const insertIntoArray = (itemsArray) => {
+        if (newFinding.displayCondition) {
+            const parentId = newFinding.displayCondition.triggerFindingId;
             const parentIndex = itemsArray.findIndex(item => item.id === parentId);
             if (parentIndex > -1) {
-                itemsArray.splice(parentIndex + 1, 0, findingToInsert);
+                itemsArray.splice(parentIndex + 1, 0, newFinding);
                 return;
             }
         }
-        itemsArray.push(findingToInsert);
+        itemsArray.push(newFinding);
     };
 
     if (examId.startsWith('custom_')) {
@@ -551,81 +796,23 @@ function saveFinding(currentFinding) {
         if (!exam.findings[catKey]) {
             exam.findings[catKey] = { name: "Categoria Personalizada", items: [] };
         }
-        insertFinding(exam.findings[catKey].items, newFinding);
-
+        insertIntoArray(exam.findings[catKey].items);
     } else {
         if (!customAdditions[examId]) customAdditions[examId] = {};
         const catKey = categoryKey || 'cat_' + Date.now();
         if (!customAdditions[examId][catKey]) {
             customAdditions[examId][catKey] = { name: "Achados Adicionados", items: [] };
         }
-        insertFinding(customAdditions[examId][catKey].items, newFinding);
-    }
-
-    saveCustomData();
-    closeFindingModal();
-    renderFindings();
-}
-
-function saveFindingChanges(currentFinding) {
-    const { examId, findingId } = currentFinding;
-    const finding = findFindingById(findingId);
-    if (!finding) return;
-    finding.question = document.getElementById('findingQuestion').value.trim();
-    finding.info = document.getElementById('findingInfo').value.trim();
-    const answerGroups = document.querySelectorAll('#answersContainer .answer-input-group');
-    const answers = Array.from(answerGroups).map(div => ({
-        id: `ans_${Date.now()}_${Math.random()}`,
-        text: div.querySelector('.answer-text').value.trim(),
-        description: div.querySelector('.answer-description').value.trim(),
-        isNegative: div.querySelector('.answer-is-negative').checked
-    })).filter(ans => ans.text && ans.description);
-
-    finding.answers = answers;
-    finding.type = answers.length > 2 || answers.some(a => !['sim', 'não'].includes(a.text.toLowerCase())) ? 'multiple-choice' : 'yes-no';
-
-    saveCustomData();
-    closeFindingModal();
-    renderFindings();
-}
-
-function saveExamChanges(examId) {
-    const name = document.getElementById('newExamName').value.trim();
-    const desc = document.getElementById('newExamDescription').value.trim();
-    if (!name || !desc) return;
-    customExams[examId].name = name;
-    customExams[examId].description = desc;
-    saveCustomData();
-    toggleAddExamForm();
-    renderExamSelection();
-}
-
-function toggleConditionalUI() {
-    const checkbox = document.getElementById('conditionalCheckbox');
-    const controls = document.getElementById('conditionalControls');
-    if (checkbox.checked) {
-        controls.classList.remove('hidden');
-    } else {
-        controls.classList.add('hidden');
+        insertIntoArray(customAdditions[examId][catKey].items);
     }
 }
 
-function showInfoModal(findingId) {
+function showInfoDrawer(findingId) {
     const finding = findFindingById(findingId);
     const infoText = finding?.info;
-    if (!infoText || !infoText.trim()) { alert("Nenhuma informação adicional disponível."); return; }
-    document.getElementById('infoModalContent').innerHTML = infoText;
-    document.getElementById('infoModal').style.display = 'flex';
-}
-
-function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
-
-function openHelpModal() {
-    document.getElementById('helpModal').style.display = 'flex';
-}
-
-function closeHelpModal() {
-    document.getElementById('helpModal').style.display = 'none';
+    if (!infoText || !infoText.trim()) { showToast("Nenhuma informação adicional disponível.", 'info'); return; }
+    
+    openDrawer('Informações', `<div class="text-gray-300 leading-relaxed">${infoText}</div>`);
 }
 
 // ======== LAUDO ========
@@ -633,26 +820,54 @@ function updatePreview() { document.getElementById('previewContent').textContent
 
 
 // ======== EXAMES E CATEGORIAS CUSTOMIZADOS ========
-function toggleAddExamForm() { document.getElementById('addExamForm').classList.toggle('hidden'); }
-function addNewExam() { const name = document.getElementById('newExamName').value.trim(); const desc = document.getElementById('newExamDescription').value.trim(); if (!name || !desc) return; const id = 'custom_' + Date.now(); customExams[id] = { id, name, description: desc, findings: { personalizado: { name: "Personalizado", items: [] } } }; saveCustomData(); toggleAddExamForm(); renderExamSelection(); }
-function deleteExam(examId) { if(confirm('Deletar este exame e todos os seus achados?')){ delete customExams[examId]; selectedExams = selectedExams.filter(id => id !== examId); saveCustomData(); renderExamSelection(); }}
-function addCategory(examId) { const name = prompt("Nome da nova seção:"); if (name) { const catKey = 'cat_' + Date.now(); customExams[examId].findings[catKey] = { name, items: [] }; saveCustomData(); renderFindings(); }}
-function editCategoryName(examId, catKey) { const newName = prompt("Novo nome:", customExams[examId].findings[catKey].name); if (newName) { customExams[examId].findings[catKey].name = newName; saveCustomData(); renderFindings(); }}
-function deleteCategory(examId, catKey) { const cat = customExams[examId].findings[catKey]; if(confirm(`Deletar a seção "${cat.name}" e seus ${cat.items.length} achados?`)){ delete customExams[examId].findings[catKey]; saveCustomData(); renderFindings(); }}
+// Funções de categoria mantidas para compatibilidade (serão substituídas por Drawers futuramente)
+function addCategory(examId) {
+    if (!requireEditMode()) return;
+    
+    const content = `
+        <div class="form-group">
+            <label class="block mb-1 font-semibold">Nome da Nova Seção</label>
+            <input type="text" id="drawerCategoryName" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" placeholder="Ex: Reflexos">
+        </div>
+    `;
 
-function updateFindingModalUI() {
-    const type = document.getElementById('findingType').value;
-    const answersGroup = document.getElementById('answersGroup');
-    const reportLabelGroup = document.getElementById('reportLabelGroup');
-
-    if (type === 'open-text') {
-        answersGroup.classList.add('hidden');
-        reportLabelGroup.classList.remove('hidden');
-    } else {
-        answersGroup.classList.remove('hidden');
-        reportLabelGroup.classList.add('hidden');
-    }
+    openDrawer('Nova Seção', content, () => {
+        const name = document.getElementById('drawerCategoryName').value.trim();
+        if (!name) { showToast('Nome é obrigatório', 'error'); return; }
+        
+        const catKey = 'cat_' + Date.now();
+        customExams[examId].findings[catKey] = { name, items: [] };
+        saveCustomData();
+        renderFindings();
+        closeDrawer();
+        showToast('Seção criada!', 'success');
+    });
 }
+
+function editCategoryName(examId, catKey) {
+    if (!requireEditMode()) return;
+    const currentName = customExams[examId].findings[catKey].name;
+    
+    const content = `
+        <div class="form-group">
+            <label class="block mb-1 font-semibold">Nome da Seção</label>
+            <input type="text" id="drawerCategoryName" class="w-full p-2 border border-gray-600 bg-gray-800 rounded-md text-white" value="${currentName}">
+        </div>
+    `;
+
+    openDrawer('Renomear Seção', content, () => {
+        const newName = document.getElementById('drawerCategoryName').value.trim();
+        if (!newName) { showToast('Nome é obrigatório', 'error'); return; }
+        
+        customExams[examId].findings[catKey].name = newName;
+        saveCustomData();
+        renderFindings();
+        closeDrawer();
+        showToast('Seção renomeada!', 'success');
+    });
+}
+function deleteCategory(examId, catKey) { if (!requireEditMode()) return; const cat = customExams[examId].findings[catKey]; if(confirm(`Deletar a seção "${cat.name}" e seus ${cat.items.length} achados?`)){ delete customExams[examId].findings[catKey]; saveCustomData(); renderFindings(); }}
+
 
 function positionPreviewToggle() {
   const panel = document.getElementById('previewPanel');
@@ -693,6 +908,54 @@ function togglePreviewPanel() {
     btn.title = 'Ocultar pré-visualização';
   }
   positionPreviewToggle();
+}
+
+function updateFindingsOrder(examId, categoryKey, newOrderIds) {
+    let itemsArray;
+    if (examId.startsWith('custom_')) {
+        itemsArray = customExams[examId].findings[categoryKey].items;
+    } else {
+        itemsArray = customAdditions[examId][categoryKey].items;
+    }
+
+    // Create a map for quick lookup
+    const itemsMap = new Map(itemsArray.map(item => [item.id, item]));
+    
+    // Reconstruct the array based on new order
+    // Note: newOrderIds might not contain all items if some are hidden (conditional)
+    // But Sortable usually works on the visible list.
+    // If we have conditional logic, reordering might be tricky.
+    // For now, we assume flat reordering of what's visible.
+    
+    const newItems = [];
+    const seenIds = new Set();
+
+    newOrderIds.forEach(id => {
+        if (itemsMap.has(id)) {
+            newItems.push(itemsMap.get(id));
+            seenIds.add(id);
+        }
+    });
+
+    // Add any items that were not in the new order (e.g. hidden ones)
+    // This appends them to the end, which might not be ideal but prevents data loss.
+    itemsArray.forEach(item => {
+        if (!seenIds.has(item.id)) {
+            newItems.push(item);
+        }
+    });
+
+    // Update the source
+    if (examId.startsWith('custom_')) {
+        customExams[examId].findings[categoryKey].items = newItems;
+    } else {
+        customAdditions[examId][categoryKey].items = newItems;
+    }
+
+    saveCustomData();
+    // No need to re-render immediately as the DOM is already updated by Sortable
+    // But if we want to ensure consistency (e.g. conditional logic), we might want to.
+    // renderFindings(); 
 }
 
 function reorderFindings(items) {

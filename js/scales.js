@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
 function proceedToScale() {
     if (selectedScales.length === 0) {
-        alert('Selecione pelo menos uma escala.');
+        showToast('Selecione pelo menos uma escala.', 'warning');
         return;
     }
     answersState = {};
@@ -54,7 +54,7 @@ function startNew() {
 
 function copyToClipboard() {
     const textToCopy = document.getElementById('resultArea').innerText;
-    navigator.clipboard.writeText(textToCopy).then(() => alert('Resultado copiado para a área de transferência!'));
+    navigator.clipboard.writeText(textToCopy).then(() => showToast('Resultado copiado para a área de transferência!', 'success'));
 }
 
 // ======== LÓGICA DE DADOS (MERGE E BUSCA) ========
@@ -139,7 +139,7 @@ function addNewScale() {
     const isProgressive = document.getElementById('newScaleProgressive').checked;
 
     if (!name || !desc) {
-        alert("O Nome e a Descrição Curta são obrigatórios.");
+        showToast("O Nome e a Descrição Curta são obrigatórios.", 'error');
         return;
     }
 
@@ -416,7 +416,7 @@ function saveScaleChanges(scaleId) {
     const instructions = document.getElementById('newScaleInstructions').value.trim();
     const isProgressive = document.getElementById('newScaleProgressive').checked;
 
-    if (!name || !desc) return alert("O Nome e a Descrição Curta são obrigatórios.");
+    if (!name || !desc) return showToast("O Nome e a Descrição Curta são obrigatórios.", 'error');
 
     customScales[scaleId].name = name;
     customScales[scaleId].description = desc;
@@ -487,7 +487,7 @@ function saveQuestion(scaleId) {
     const questionText = document.getElementById('questionText').value.trim();
     const explanationText = document.getElementById('questionExplanation').value.trim();
 
-    if (!questionText) return alert('O texto da pergunta é obrigatório.');
+    if (!questionText) return showToast('O texto da pergunta é obrigatório.', 'error');
 
     const answerGroups = document.querySelectorAll('#answersContainer .answer-input-group');
     const answers = Array.from(answerGroups).map(div => ({
@@ -496,7 +496,7 @@ function saveQuestion(scaleId) {
         points: parseFloat(div.querySelector('.answer-points').value) || 0
     })).filter(ans => ans.text);
 
-    if (answers.length === 0) return alert('Adicione pelo menos uma resposta.');
+    if (answers.length === 0) return showToast('Adicione pelo menos uma resposta.', 'error');
 
     const newQuestion = {
         id: 'custom_q_' + Date.now(),

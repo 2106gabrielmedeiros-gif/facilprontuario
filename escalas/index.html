@@ -5,25 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil - Escalas Médicas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
     <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
-        <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+        <div class="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:gap-6">
             <a href="../index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
-            <div class="hidden md:flex items-center gap-2 text-sm font-semibold">
-                <a href="../index.html" class="nav-link text-slate-100/80">Home</a>
-                <a href="../exames.html" class="nav-link text-slate-100/80">Exames</a>
-                <a href="index.html" class="nav-link text-white">Escalas</a>
-                <a href="../prescricoes/index.html" class="nav-link text-slate-100/80">Prescrições</a>
-                <a href="#" onclick="openHelpModal()" class="nav-link text-slate-100/80">Ajuda</a>
+            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold w-full md:flex-1 md:justify-center md:flex-nowrap">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../exames.html" class="nav-link">Exames</a>
+                <a href="index.html" class="nav-link active">Escalas</a>
+                <a href="../prescricoes/index.html" class="nav-link">Prescrições</a>
+                <a href="#" onclick="openHelpModal()" class="nav-link">Ajuda</a>
             </div>
-            <div class="flex flex-wrap items-center gap-2 bg-white/5 rounded-2xl px-3 py-2 border border-white/10">
-                <button id="export-button" class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition" onclick="exportData('scales')">Exportar</button>
-                <label class="px-4 py-2 text-sm font-semibold rounded-xl bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md transition cursor-pointer">
+            <div class="flex flex-wrap items-center justify-end gap-1.5 bg-white/5 rounded-2xl px-3 py-2 border border-white/10 w-full md:w-auto md:flex-nowrap md:justify-end">
+                <button id="export-button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:text-black hover:shadow-md transition" onclick="exportData('scales')">Exportar</button>
+                <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md hover:text-black transition cursor-pointer">
                     Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
                 </label>
-                <button class="px-4 py-2 text-sm font-semibold rounded-xl bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
+                <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
             </div>
         </div>
     </nav>
@@ -100,7 +101,7 @@
                 <div id="questionModal" class="modal">
                     <div class="modal-content p-6">
                         <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 id="questionModalTitle" class="text-xl font-bold">Adicionar/Editar Pergunta</h3><span class="close" onclick="closeQuestionModal()">&times;</span>
+                            <h3 id="questionModalTitle" class="text-xl font-bold">Adicionar/Editar Pergunta</h3><button type="button" class="modal-close" aria-label="Fechar" onclick="closeQuestionModal()">&times;</button>
                         </div>
                         <div class="space-y-4">
                             <div class="form-group"><label for="questionText" class="block mb-1">Pergunta:</label><input type="text" id="questionText" placeholder="Ex: Paciente apresenta febre?" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
@@ -117,7 +118,7 @@
                
                 <div id="scaleSettingsModal" class="modal">
                     <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4"><h3 id="scaleSettingsModalTitle" class="text-xl font-bold">Configurar Interpretação</h3><span class="close" onclick="closeScaleSettingsModal()">&times;</span></div>
+                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4"><h3 id="scaleSettingsModalTitle" class="text-xl font-bold">Configurar Interpretação</h3><button type="button" class="modal-close" aria-label="Fechar" onclick="closeScaleSettingsModal()">&times;</button></div>
                         <p class="text-gray-600 dark:text-gray-400 mb-4">Defina as faixas de pontuação e o texto de resultado correspondente.</p>
                         <div class="form-group">
                             <label class="block mb-1">Regras de Interpretação:</label>
@@ -138,26 +139,36 @@
                     <div class="modal-content p-6">
                         <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                             <h3 class="text-xl font-bold">Como Usar as Escalas</h3>
-                            <span class="close" onclick="closeHelpModal()">&times;</span>
+                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeHelpModal()">&times;</button>
                         </div>
-                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none">
-                            <h4>Passo 1: Selecione a Escala</h4>
-                            <p>Na tela inicial, clique na escala que deseja aplicar. As escalas selecionadas ficarão destacadas. Você pode adicionar suas próprias escalas customizadas clicando em "Adicionar Nova Escala".</p>
+                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none text-slate-300">
+                            <p class="mb-4 text-lg">As <strong>Escalas Clínicas</strong> oferecem cálculo automático de scores e interpretação imediata de resultados.</p>
                             
-                            <h4>Passo 2: Responda as Perguntas</h4>
-                            <p>Após selecionar a escala e clicar em "Prosseguir", você verá uma lista de perguntas. Marque as respostas correspondentes a sua avaliação.</p>
-                            <p>À direita, um painel de pré-visualização mostrará o resultado sendo montado em tempo real.</p>
-                            
-                            <h4>Passo 3: Gere e Copie o Resultado</h4>
-                            <p>Quando terminar de responder, clique em "Gerar Resultado". O texto final com a pontuação e interpretação será apresentado. Você pode então clicar em "Copiar" para transferir o resultado para a área de transferência.</p>
-            
-                            <hr class="my-4">
-            
-                            <h4>Recursos Adicionais:</h4>
-                            <ul class="list-disc pl-5">
-                                <li><strong>Adicionar Perguntas:</strong> Dentro de uma escala, na tela de edição, você pode adicionar perguntas customizadas.</li>
-                                <li><strong>Importar/Exportar:</strong> Use os botões no cabeçalho para salvar ("Exportar") suas configurações de escalas customizadas em um arquivo. Você pode carregar ("Importar") esse arquivo em outro computador ou navegador.</li>
-                            </ul>
+                            <div class="space-y-4">
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                        Aplicação
+                                    </h4>
+                                    <p class="text-sm">Selecione a escala desejada na lista. Responda aos critérios apresentados; o sistema calcula a pontuação parcial em tempo real conforme você avança.</p>
+                                </div>
+
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                        Resultado e Laudo
+                                    </h4>
+                                    <p class="text-sm">Ao finalizar, clique em "Gerar Resultado". Você receberá um texto formatado com a pontuação total e a interpretação clínica (ex: risco, gravidade), pronto para ser copiado.</p>
+                                </div>
+
+                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                                    <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
+                                        <span class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                                        Criação de Escalas
+                                    </h4>
+                                    <p class="text-sm">É possível criar suas próprias escalas! Defina perguntas, valores para cada resposta e faixas de interpretação (ex: 0-5: Leve, 6-10: Grave) através do editor visual.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
