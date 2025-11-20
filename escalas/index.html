@@ -1,193 +1,397 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark" data-theme="dark">
+<html lang="pt-BR" class="scroll-smooth dark" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prontuário Fácil - Escalas Médicas</title>
+    <title>Prontuário Fácil | Escalas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
 </head>
-<body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
-    <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
-        <div class="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:gap-6">
-            <a href="../index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
-            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold w-full md:flex-1 md:justify-center md:flex-nowrap">
-                <a href="../index.html" class="nav-link">Home</a>
-                <a href="../exames.html" class="nav-link">Exames</a>
-                <a href="index.html" class="nav-link active">Escalas</a>
-                <a href="../prescricoes/index.html" class="nav-link">Prescrições</a>
-                <a href="#" onclick="openHelpModal()" class="nav-link">Ajuda</a>
-            </div>
-            <div class="flex flex-wrap items-center justify-end gap-1.5 bg-white/5 rounded-2xl px-3 py-2 border border-white/10 w-full md:w-auto md:flex-nowrap md:justify-end">
-                <button id="export-button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:text-black hover:shadow-md transition" onclick="exportData('scales')">Exportar</button>
-                <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md hover:text-black transition cursor-pointer">
-                    Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
-                </label>
-                <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
-            </div>
+
+<body class="text-slate-100 antialiased min-h-screen flex flex-col">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div
+            class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-500/10 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+        <div
+            class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-sky-500/5 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+    </div>
+
+    <nav class="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between px-6 py-6 relative z-20">
+        <a href="../index.html" class="text-2xl font-bold tracking-tight text-white">Prontuário <span
+                class="text-emerald-400">Fácil</span></a>
+
+        <div class="hidden md:flex gap-1 p-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+            <a href="../index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Home</a>
+            <a href="../exames.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Exames</a>
+            <a href="index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-white/10 shadow-sm transition-all">Escalas</a>
+            <a href="../prescricoes/index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Prescrições</a>
+            <a href="#" onclick="openHelpModal()"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Ajuda</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="export-button"
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all"
+                title="Exportar Dados" onclick="exportData('scales')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+            </button>
+            <label
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+                title="Importar Dados">
+                <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+            </label>
+            <button onclick="masterReset()"
+                class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all"
+                title="Resetar Tudo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+            </button>
         </div>
     </nav>
-    <header class="page-hero px-6">
-        <span class="page-hero__badge">Escalas clínicas</span>
-        <h1>Calcule escores e interpretações oficiais sem sair do navegador.</h1>
-        <p>Escolha escalas validadas, aplique-as com segurança, salve respostas e exporte configurações para toda a equipe.</p>
-        <div class="hero-actions">
-            <button class="btn btn-primary" onclick="document.getElementById('screen1').scrollIntoView({behavior:'smooth'});">Selecionar escalas</button>
-            <div class="meta">
-                <span>Interpretação automática</span>
-                <span>Offline-ready</span>
+
+    <header class="relative z-10 px-6 py-12 text-center max-w-4xl mx-auto">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-6">
+            Escalas Clínicas
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">Cálculo automático e interpretação
+            imediata.</h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+            Escolha escalas validadas, aplique-as com segurança e obtenha resultados prontos para o prontuário.
+        </p>
+    </header>
+
+    <main class="flex-1 relative z-10">
+        <div class="flow-stepper glass mb-8 max-w-xl mx-auto" data-stepper>
+            <button type="button" class="flow-step is-active" data-step-index="0" data-step-target="screen1">
+                <span class="flow-step__number">1</span>
+                <span class="flow-step__label">Seleção</span>
+            </button>
+            <div class="w-12 h-px bg-white/10"></div>
+            <button type="button" class="flow-step" data-step-index="1" data-step-target="screen2">
+                <span class="flow-step__number">2</span>
+                <span class="flow-step__label">Perguntas</span>
+            </button>
+            <div class="w-12 h-px bg-white/10"></div>
+            <button type="button" class="flow-step" data-step-index="2" data-step-target="screen3">
+                <span class="flow-step__number">3</span>
+                <span class="flow-step__label">Resultado</span>
+            </button>
+        </div>
+
+        <div id="screen1" class="screen active container mx-auto max-w-7xl px-6 pb-12">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="glass p-6 rounded-2xl sticky top-24">
+                        <h2 class="text-xl font-bold mb-2 text-white">Escalas</h2>
+                        <p class="text-slate-400 text-sm mb-6">Selecione uma escala para iniciar.</p>
+                        <div class="relative">
+                            <input type="text" id="scaleSearchInput" onkeyup="renderScaleSelection()"
+                                placeholder="Buscar escala..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-slate-500 text-white">
+                            <svg class="absolute left-3 top-3 w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-9">
+                    <div class="exam-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="scaleGrid"></div>
+
+                    <div class="fixed bottom-6 right-6 z-40 flex gap-3">
+                        <button class="btn btn-secondary glass backdrop-blur-xl shadow-2xl"
+                            onclick="toggleAddScaleForm()">
+                            <span class="text-lg mr-1">+</span> Nova
+                        </button>
+                        <button class="btn btn-primary shadow-2xl shadow-emerald-500/20" onclick="proceedToScale()">
+                            Prosseguir <span class="ml-2">→</span>
+                        </button>
+                    </div>
+
+                    <div id="addScaleForm" class="hidden mt-6 glass p-6 rounded-2xl border border-emerald-500/30">
+                        <div class="flex items-center gap-3 mb-6">
+                            <input type="checkbox" id="newScaleProgressive"
+                                class="w-5 h-5 rounded border-gray-600 text-emerald-500 focus:ring-emerald-500 bg-slate-800">
+                            <label for="newScaleProgressive" class="text-sm font-medium text-slate-300">Esta é uma
+                                escala progressiva (lógica do "último sim", tipo PPS)</label>
+                        </div>
+                        <h3 id="scaleFormTitle" class="text-xl font-bold mb-4 text-white">Adicionar Nova Escala</h3>
+                        <div class="space-y-4">
+                            <div class="form-group">
+                                <label for="newScaleName" class="block mb-1 text-sm font-medium text-slate-300">Nome da
+                                    Escala:</label>
+                                <input type="text" id="newScaleName"
+                                    class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-emerald-500/50 outline-none">
+                            </div>
+                            <div class="form-group">
+                                <label for="newScaleDescription"
+                                    class="block mb-1 text-sm font-medium text-slate-300">Descrição Curta:</label>
+                                <input type="text" id="newScaleDescription" placeholder="Um resumo breve da escala..."
+                                    class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-emerald-500/50 outline-none">
+                            </div>
+                            <div class="form-group">
+                                <label for="newScaleInstructions"
+                                    class="block mb-1 text-sm font-medium text-slate-300">Instruções de
+                                    Preenchimento:</label>
+                                <textarea id="newScaleInstructions" rows="5"
+                                    placeholder="Insira aqui as instruções detalhadas..."
+                                    class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-emerald-500/50 outline-none"></textarea>
+                            </div>
+                            <div class="flex gap-3 pt-2">
+                                <button id="saveScaleBtn" class="btn btn-success"
+                                    onclick="addNewScale()">Adicionar</button>
+                                <button class="btn btn-secondary" onclick="toggleAddScaleForm()">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
-    <div class="page-shell">
-            
-                <div id="screen1" class="screen active container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div class="md:col-span-1">
-                                <div class="glass-panel p-6 h-full">
-                                <h2 class="text-2xl font-bold mb-2">Escalas Médicas</h2>
-                                <p class="text-slate-300 mb-4">Aplique escalas com cálculo automático de pontuação.</p>
-                                <input type="text" id="scaleSearchInput" onkeyup="renderScaleSelection()" placeholder="Buscar escala por nome..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                </div>
-                            </div>
-                            <div class="md:col-span-2">
-                                <div class="exam-grid" id="scaleGrid"></div>
-                                <div class="button-group mt-6">
-                                    <button class="btn btn-primary" onclick="proceedToScale()">Prosseguir</button>
-                                    <button class="btn btn-secondary" onclick="toggleAddScaleForm()">Adicionar Nova Escala</button>
-                                </div>
-                                <div id="addScaleForm" class="add-exam-form hidden mt-6 glass-panel p-6">
-                                <div class="form-group" style="display: flex; align-items: center; gap: 10px; justify-content: start;">
-                                    <input type="checkbox" id="newScaleProgressive" style="width: auto; height: auto;">
-                                    <label for="newScaleProgressive" style="margin-bottom: 0; font-weight: normal;">Esta é uma escala progressiva (lógica do "último sim", tipo PPS)</label>
-                                </div>
-                                <h3 id="scaleFormTitle" class="text-xl font-bold mb-4">Adicionar Nova Escala</h3>
-                                <div class="space-y-4">
-                                    <div class="form-group"><label for="newScaleName" class="block mb-1">Nome da Escala:</label><input type="text" id="newScaleName" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                                    <div class="form-group"><label for="newScaleDescription" class="block mb-1">Descrição Curta:</label><input type="text" id="newScaleDescription" placeholder="Um resumo breve da escala..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                                    <div class="form-group"><label for="newScaleInstructions" class="block mb-1">Instruções de Preenchimento:</label><textarea id="newScaleInstructions" rows="5" placeholder="Insira aqui as instruções detalhadas..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea></div>
-                                    <div class="button-group"><button id="saveScaleBtn" class="btn btn-success" onclick="addNewScale()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddScaleForm()">Cancelar</button></div>
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div id="screen2" class="screen container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <h2 class="text-2xl font-bold mb-4">Responda as Perguntas</h2>
-                        <div id="scaleInstructionsContainer" style="margin-bottom: 25px;"></div>
-                        <div id="questionsContainer"></div>
-                        <div class="button-group mt-6"><button class="btn btn-secondary" onclick="backToSelection()">Voltar</button><button class="btn btn-primary" onclick="generateReport()">Gerar Resultado</button></div>
-                        <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
-                        <div id="previewPanel" class="preview-panel">
-                            <h3 class="text-xl font-bold mb-2">Pré-visualização do Resultado</h3>
-                            <div id="previewContent">Selecione as respostas...</div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div id="screen3" class="screen container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <h2 class="text-2xl font-bold mb-4">Resultado da Escala</h2>
-                        <div id="resultArea" class="result-area glass-panel mt-4 p-4"></div>
-                        <div class="button-group mt-6"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="startNew()">Nova Avaliação</button></div>
-                    </div>
-                </div>
-            
-                <div id="questionModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 id="questionModalTitle" class="text-xl font-bold">Adicionar/Editar Pergunta</h3><button type="button" class="modal-close" aria-label="Fechar" onclick="closeQuestionModal()">&times;</button>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="form-group"><label for="questionText" class="block mb-1">Pergunta:</label><input type="text" id="questionText" placeholder="Ex: Paciente apresenta febre?" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                            <div class="form-group"><label for="questionExplanation" class="block mb-1">Explicação (Opcional):</label><textarea id="questionExplanation" rows="3" placeholder="Descreva o que a pergunta avalia..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea></div>
-                            <div class="form-group">
-                                <label class="block mb-1">Respostas Possíveis:</label>
-                                <div id="answersContainer"></div>
-                                <button class="btn btn-secondary btn-small mt-2" onclick="addAnswerField()">+ Adicionar Resposta</button>
-                            </div>
-                            <div class="button-group"><button id="saveQuestionBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeQuestionModal()">Cancelar</button></div>
-                        </div>
-                    </div>
-                </div>
-               
-                <div id="scaleSettingsModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4"><h3 id="scaleSettingsModalTitle" class="text-xl font-bold">Configurar Interpretação</h3><button type="button" class="modal-close" aria-label="Fechar" onclick="closeScaleSettingsModal()">&times;</button></div>
-                        <p class="text-gray-600 dark:text-gray-400 mb-4">Defina as faixas de pontuação e o texto de resultado correspondente.</p>
-                        <div class="form-group">
-                            <label class="block mb-1">Regras de Interpretação:</label>
-                            <div class="interpretation-rule font-bold">
-                                <span>De (pontos)</span>
-                                <span>Até (pontos)</span>
-                                <span>Texto da Interpretação</span>
-                                <span></span>
-                            </div>
-                            <div id="interpretationsContainer"></div>
-                            <button class="btn btn-secondary btn-small mt-2" onclick="addInterpretationRule()">+ Adicionar Faixa</button>
-                        </div>
-                        <div class="button-group"><button id="saveScaleSettingsBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeScaleSettingsModal()">Cancelar</button></div>
-                    </div>
-                </div>
-            
-                <div id="helpModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 class="text-xl font-bold">Como Usar as Escalas</h3>
-                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeHelpModal()">&times;</button>
-                        </div>
-                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none text-slate-300">
-                            <p class="mb-4 text-lg">As <strong>Escalas Clínicas</strong> oferecem cálculo automático de scores e interpretação imediata de resultados.</p>
-                            
-                            <div class="space-y-4">
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                                        Aplicação
-                                    </h4>
-                                    <p class="text-sm">Selecione a escala desejada na lista. Responda aos critérios apresentados; o sistema calcula a pontuação parcial em tempo real conforme você avança.</p>
-                                </div>
 
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                        Resultado e Laudo
-                                    </h4>
-                                    <p class="text-sm">Ao finalizar, clique em "Gerar Resultado". Você receberá um texto formatado com a pontuação total e a interpretação clínica (ex: risco, gravidade), pronto para ser copiado.</p>
-                                </div>
-
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
-                                        Criação de Escalas
-                                    </h4>
-                                    <p class="text-sm">É possível criar suas próprias escalas! Defina perguntas, valores para cada resposta e faixas de interpretação (ex: 0-5: Leve, 6-10: Grave) através do editor visual.</p>
-                                </div>
+        <div id="screen2" class="screen container mx-auto max-w-7xl px-6 pb-12">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8">
+                    <div class="glass rounded-2xl overflow-hidden">
+                        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900/30">
+                            <h2 class="text-xl font-bold text-white">Responda as Perguntas</h2>
+                            <button class="btn btn-sm btn-secondary" onclick="backToSelection()">Voltar</button>
+                        </div>
+                        <div class="p-6">
+                            <div id="scaleInstructionsContainer"
+                                class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-200 text-sm">
                             </div>
+                            <div id="questionsContainer" class="space-y-6"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4">
+                    <div class="sticky top-24 space-y-4">
+                        <div id="previewPanel" class="glass rounded-2xl p-6 border-l-4 border-l-emerald-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Pré-visualização
+                                </h3>
+                                <span class="text-xs text-slate-500">Tempo real</span>
+                            </div>
+                            <div id="previewContent"
+                                class="text-sm text-slate-300 leading-relaxed font-mono bg-slate-950/50 p-4 rounded-lg border border-white/5 min-h-[100px]">
+                                Selecione as respostas...
+                            </div>
+                            <button class="btn btn-primary w-full mt-4" onclick="generateReport()">
+                                Gerar Resultado
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <script src="escalasNativas.js"></script>
-            <script src="../js/utils.js"></script>
-            <script src="../js/scales.js"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const currentPage = window.location.pathname.split('/').pop();
-                    const navLinks = document.querySelectorAll('.nav-link');
-                    navLinks.forEach(link => {
-                        const linkPage = link.getAttribute('href').split('/').pop();
-                        if (linkPage === currentPage) {
-                            link.classList.add('selected');
-                        }
-                    });
-                });
-            </script>
-            </body>
-            </html>
-            
+        </div>
+
+        <div id="screen3" class="screen container mx-auto max-w-4xl px-6 py-12">
+            <div class="glass rounded-2xl p-8 md:p-12 text-center space-y-8">
+                <div
+                    class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                </div>
+
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Resultado da Escala</h2>
+                    <p class="text-slate-400">Pontuação calculada e interpretação.</p>
+                </div>
+
+                <div id="resultArea"
+                    class="text-left bg-slate-950 p-6 rounded-xl border border-white/10 font-mono text-sm text-slate-300 leading-relaxed shadow-inner">
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="btn btn-success px-8" onclick="copyToClipboard()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copiar
+                    </button>
+                    <button class="btn btn-primary" onclick="startNew()">Nova Avaliação</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="questionModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 id="questionModalTitle" class="text-xl font-bold text-white">Adicionar/Editar Pergunta</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeQuestionModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="form-group">
+                    <label for="questionText" class="block mb-1 text-sm font-medium text-slate-300">Pergunta:</label>
+                    <input type="text" id="questionText" placeholder="Ex: Paciente apresenta febre?"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-emerald-500/50 outline-none">
+                </div>
+                <div class="form-group">
+                    <label for="questionExplanation" class="block mb-1 text-sm font-medium text-slate-300">Explicação
+                        (Opcional):</label>
+                    <textarea id="questionExplanation" rows="3" placeholder="Descreva o que a pergunta avalia..."
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-emerald-500/50 outline-none"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="block mb-1 text-sm font-medium text-slate-300">Respostas Possíveis:</label>
+                    <div id="answersContainer" class="space-y-2 mb-2"></div>
+                    <button class="btn btn-secondary btn-small w-full" onclick="addAnswerField()">+ Adicionar
+                        Resposta</button>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button id="saveQuestionBtn" class="btn btn-success">Salvar</button>
+                    <button class="btn btn-secondary" onclick="closeQuestionModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scaleSettingsModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 id="scaleSettingsModalTitle" class="text-xl font-bold text-white">Configurar Interpretação</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeScaleSettingsModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <p class="text-slate-400 mb-4">Defina as faixas de pontuação e o texto de resultado correspondente.</p>
+            <div class="form-group">
+                <label class="block mb-1 text-sm font-medium text-slate-300">Regras de Interpretação:</label>
+                <div class="grid grid-cols-12 gap-2 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <div class="col-span-2">De</div>
+                    <div class="col-span-2">Até</div>
+                    <div class="col-span-7">Interpretação</div>
+                    <div class="col-span-1"></div>
+                </div>
+                <div id="interpretationsContainer" class="space-y-2"></div>
+                <button class="btn btn-secondary btn-small w-full mt-3" onclick="addInterpretationRule()">+ Adicionar
+                    Faixa</button>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button id="saveScaleSettingsBtn" class="btn btn-success">Salvar</button>
+                <button class="btn btn-secondary" onclick="closeScaleSettingsModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-bold text-white">Como Usar as Escalas</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeHelpModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div id="helpModalContent" class="prose prose-invert max-w-none text-slate-300">
+                <p class="mb-4 text-lg">As <strong>Escalas Clínicas</strong> oferecem cálculo automático de scores e
+                    interpretação imediata de resultados.</p>
+
+                <div class="space-y-4">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
+                            <span
+                                class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            Aplicação
+                        </h4>
+                        <p class="text-sm">Selecione a escala desejada na lista. Responda aos critérios apresentados; o
+                            sistema calcula a pontuação parcial em tempo real conforme você avança.</p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+                            <span
+                                class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            Resultado e Laudo
+                        </h4>
+                        <p class="text-sm">Ao finalizar, clique em "Gerar Resultado". Você receberá um texto formatado
+                            com a pontuação total e a interpretação clínica (ex: risco, gravidade), pronto para ser
+                            copiado.</p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
+                            <span
+                                class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                            Criação de Escalas
+                        </h4>
+                        <p class="text-sm">É possível criar suas próprias escalas! Defina perguntas, valores para cada
+                            resposta e faixas de interpretação (ex: 0-5: Leve, 6-10: Grave) através do editor visual.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="escalasNativas.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/scales.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPage = window.location.pathname.split('/').pop();
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                const linkPage = link.getAttribute('href').split('/').pop();
+                if (linkPage === currentPage) {
+                    link.classList.add('selected');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

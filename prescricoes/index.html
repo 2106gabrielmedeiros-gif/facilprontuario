@@ -1,142 +1,261 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark" data-theme="dark">
+<html lang="pt-BR" class="scroll-smooth dark" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prontuário Fácil - Prescrições Médicas</title>
+    <title>Prontuário Fácil | Prescrições</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
 </head>
-<body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
-    <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
-        <div class="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:gap-6">
-            <a href="../index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
-            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold w-full md:flex-1 md:justify-center md:flex-nowrap">
-                <a href="../index.html" class="nav-link">Home</a>
-                <a href="../exames.html" class="nav-link">Exames</a>
-                <a href="../escalas/index.html" class="nav-link">Escalas</a>
-                <a href="index.html" class="nav-link active">Prescrições</a>
-                <a href="#" onclick="openHelpModal()" class="nav-link">Ajuda</a>
-            </div>
-            <div class="flex flex-wrap items-center justify-end gap-1.5 bg-white/5 rounded-2xl px-3 py-2 border border-white/10 w-full md:w-auto md:flex-nowrap md:justify-end">
-                <button id="export-button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:text-black hover:shadow-md transition" onclick="exportData('prescriptions')">Exportar</button>
-                <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md hover:text-black transition cursor-pointer">
-                    Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
-                </label>
-                <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset Total</button>
-            </div>
+
+<body class="text-slate-100 antialiased min-h-screen flex flex-col">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div
+            class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-violet-500/10 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+        <div
+            class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-sky-500/5 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+    </div>
+
+    <nav class="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between px-6 py-6 relative z-20">
+        <a href="../index.html" class="text-2xl font-bold tracking-tight text-white">Prontuário <span
+                class="text-violet-400">Fácil</span></a>
+
+        <div class="hidden md:flex gap-1 p-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+            <a href="../index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Home</a>
+            <a href="../exames.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Exames</a>
+            <a href="../escalas/index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Escalas</a>
+            <a href="index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-white/10 shadow-sm transition-all">Prescrições</a>
+            <a href="#" onclick="openHelpModal()"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Ajuda</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="export-button"
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all"
+                title="Exportar Dados" onclick="exportData('prescriptions')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+            </button>
+            <label
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+                title="Importar Dados">
+                <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+            </label>
+            <button onclick="masterReset()"
+                class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all"
+                title="Resetar Tudo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+            </button>
         </div>
     </nav>
-    <header class="page-hero px-6">
-        <span class="page-hero__badge">Prescrições seguras</span>
-        <h1>Padronize condutas terapêuticas e ganhe agilidade na visita.</h1>
-        <p>Centralize modelos por doença, personalize doses e compartilhe protocolos em poucos cliques.</p>
-        <div class="hero-actions">
-            <button class="btn btn-primary" onclick="document.getElementById('screen1').scrollIntoView({behavior:'smooth'});">Gerenciar modelos</button>
-            <div class="meta">
-                <span>Revisão rápida</span>
-                <span>Exportação em JSON</span>
-            </div>
+
+    <header class="relative z-10 px-6 py-12 text-center max-w-4xl mx-auto">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-bold uppercase tracking-widest mb-6">
+            Prescrições Médicas
         </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">Padronize condutas e ganhe agilidade.
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+            Centralize modelos por doença, personalize doses e compartilhe protocolos em poucos cliques.
+        </p>
     </header>
-    <div class="page-shell">
-    <div id="screen1" class="screen active container mx-auto max-w-6xl px-6 py-12">
-        <div class="glass-panel p-6 md:p-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="md:col-span-1">
-                    <div class="glass-panel p-6 h-full">
-                    <h2 class="text-2xl font-bold mb-2">Modelos de Prescrição</h2>
-                    <p class="text-slate-300 mb-4">Crie e gerencie seus modelos de prescrição por doença.</p>
-                    <input type="text" id="diseaseSearchInput" onkeyup="renderDiseaseSelection()" placeholder="Buscar por nome..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
+
+    <main class="flex-1 relative z-10">
+        <div class="flow-stepper glass mb-8 max-w-xl mx-auto" data-stepper>
+            <button type="button" class="flow-step is-active" data-step-index="0" data-step-target="screen1">
+                <span class="flow-step__number">1</span>
+                <span class="flow-step__label">Patologia</span>
+            </button>
+            <div class="w-12 h-px bg-white/10"></div>
+            <button type="button" class="flow-step" data-step-index="1" data-step-target="screen2">
+                <span class="flow-step__number">2</span>
+                <span class="flow-step__label">Prescrição</span>
+            </button>
+        </div>
+
+        <div id="screen1" class="screen active container mx-auto max-w-7xl px-6 pb-12">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="glass p-6 rounded-2xl sticky top-24">
+                        <h2 class="text-xl font-bold mb-2 text-white">Doenças</h2>
+                        <p class="text-slate-400 text-sm mb-6">Selecione a patologia para ver os modelos.</p>
+                        <div class="relative">
+                            <input type="text" id="diseaseSearchInput" onkeyup="renderDiseaseSelection()"
+                                placeholder="Buscar doença..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all placeholder:text-slate-500 text-white">
+                            <svg class="absolute left-3 top-3 w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
-                <div class="md:col-span-2">
-                    <div class="exam-grid" id="diseaseGrid"></div>
-                    <div class="button-group mt-6">
-                        <button class="btn btn-secondary" onclick="toggleAddDiseaseForm()">Adicionar Nova Doença</button>
+
+                <div class="lg:col-span-9">
+                    <div class="exam-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="diseaseGrid"></div>
+
+                    <div class="fixed bottom-6 right-6 z-40 flex gap-3">
+                        <button class="btn btn-secondary glass backdrop-blur-xl shadow-2xl"
+                            onclick="toggleAddDiseaseForm()">
+                            <span class="text-lg mr-1">+</span> Nova
+                        </button>
                     </div>
-                    <div id="addDiseaseForm" class="add-exam-form hidden mt-6 glass-panel p-6">
-                    <h3 id="diseaseFormTitle" class="text-xl font-bold mb-4">Adicionar Nova Doença</h3>
-                    <div class="space-y-4">
-                        <div class="form-group"><label for="newDiseaseName" class="block mb-1">Nome da Doença:</label><input type="text" id="newDiseaseName" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                        <div class="button-group"><button id="saveDiseaseBtn" class="btn btn-success" onclick="addNewDisease()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddDiseaseForm()">Cancelar</button></div>
-                    </div>
+
+                    <div id="addDiseaseForm" class="hidden mt-6 glass p-6 rounded-2xl border border-violet-500/30">
+                        <h3 id="diseaseFormTitle" class="text-xl font-bold mb-4 text-white">Adicionar Nova Doença</h3>
+                        <div class="space-y-4">
+                            <div class="form-group">
+                                <label for="newDiseaseName" class="block mb-1 text-sm font-medium text-slate-300">Nome
+                                    da Doença:</label>
+                                <input type="text" id="newDiseaseName"
+                                    class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-violet-500/50 outline-none">
+                            </div>
+                            <div class="flex gap-3 pt-2">
+                                <button id="saveDiseaseBtn" class="btn btn-success"
+                                    onclick="addNewDisease()">Adicionar</button>
+                                <button class="btn btn-secondary" onclick="toggleAddDiseaseForm()">Cancelar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="screen2" class="screen container mx-auto max-w-6xl px-6 py-12">
-        <div class="glass-panel p-6 md:p-10">
-            <h2 id="prescriptionTitle" class="text-2xl font-bold mb-4">Prescrições para...</h2>
-            <div id="optionsContainer"></div>
-            <div class="button-group mt-6">
-                <button class="btn btn-secondary" onclick="backToSelection()">Voltar</button>
-                <button class="btn btn-primary" onclick="toggleAddOptionForm()">Adicionar Nova Opção</button>
+        <div id="screen2" class="screen container mx-auto max-w-7xl px-6 pb-12">
+            <div class="glass rounded-2xl overflow-hidden">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900/30">
+                    <h2 id="prescriptionTitle" class="text-xl font-bold text-white">Prescrições para...</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="backToSelection()">Voltar</button>
+                </div>
+                <div class="p-6">
+                    <div id="optionsContainer" class="space-y-6"></div>
+                    <button class="btn btn-primary mt-6" onclick="toggleAddOptionForm()">+ Adicionar Nova Opção</button>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div id="optionModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                <h3 id="optionModalTitle" class="text-xl font-bold">Adicionar/Editar Opção</h3>
-                <button type="button" class="modal-close" aria-label="Fechar" onclick="closeOptionModal()">&times;</button>
+    <!-- Modals -->
+    <div id="optionModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 id="optionModalTitle" class="text-xl font-bold text-white">Adicionar/Editar Opção</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeOptionModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
             <div class="space-y-4">
-                <div class="form-group"><label for="optionName" class="block mb-1">Nome da Opção:</label><input type="text" id="optionName" placeholder="Ex: Tratamento Oral" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                <div class="form-group"><label for="optionText" class="block mb-1">Texto da Prescrição:</label><textarea id="optionText" rows="10" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea></div>
-                <div class="button-group"><button id="saveOptionBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeOptionModal()">Cancelar</button></div>
+                <div class="form-group">
+                    <label for="optionName" class="block mb-1 text-sm font-medium text-slate-300">Nome da Opção:</label>
+                    <input type="text" id="optionName" placeholder="Ex: Tratamento Oral"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-violet-500/50 outline-none">
+                </div>
+                <div class="form-group">
+                    <label for="optionText" class="block mb-1 text-sm font-medium text-slate-300">Texto da
+                        Prescrição:</label>
+                    <textarea id="optionText" rows="10"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-violet-500/50 outline-none font-mono text-sm"></textarea>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button id="saveOptionBtn" class="btn btn-success">Salvar</button>
+                    <button class="btn btn-secondary" onclick="closeOptionModal()">Cancelar</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="helpModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                <h3 class="text-xl font-bold">Como Usar as Prescrições</h3>
-                <button type="button" class="modal-close" aria-label="Fechar" onclick="closeHelpModal()">&times;</button>
+    <div id="helpModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-bold text-white">Como Usar as Prescrições</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeHelpModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
-            <div id="helpModalContent" class="prose dark:prose-invert max-w-none text-slate-300">
-                <p class="mb-4 text-lg">O módulo de <strong>Prescrições</strong> agiliza o acesso a modelos terapêuticos padronizados e personalizáveis.</p>
-                
+            <div id="helpModalContent" class="prose prose-invert max-w-none text-slate-300">
+                <p class="mb-4 text-lg">O módulo de <strong>Prescrições</strong> agiliza o acesso a modelos terapêuticos
+                    padronizados e personalizáveis.</p>
+
                 <div class="space-y-4">
                     <div class="bg-white/5 p-4 rounded-xl border border-white/10">
                         <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
-                            <span class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            <span
+                                class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
                             Seleção e Busca
                         </h4>
-                        <p class="text-sm">Encontre a patologia desejada na grade ou utilize a barra de busca. Você pode criar novos grupos de doenças clicando em "Adicionar Nova Doença".</p>
+                        <p class="text-sm">Encontre a patologia desejada na grade ou utilize a barra de busca. Você pode
+                            criar novos grupos de doenças clicando em "Adicionar Nova Doença".</p>
                     </div>
 
                     <div class="bg-white/5 p-4 rounded-xl border border-white/10">
                         <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
-                            <span class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
                             Uso dos Modelos
                         </h4>
-                        <p class="text-sm">Ao selecionar uma doença, visualize as opções de tratamento. Copie o texto integralmente ou edite conforme a necessidade do paciente antes de transferir para o prontuário.</p>
+                        <p class="text-sm">Ao selecionar uma doença, visualize as opções de tratamento. Copie o texto
+                            integralmente ou edite conforme a necessidade do paciente antes de transferir para o
+                            prontuário.</p>
                     </div>
 
                     <div class="bg-white/5 p-4 rounded-xl border border-white/10">
                         <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
-                            <span class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                            <span
+                                class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
                             Gestão de Dados
                         </h4>
-                        <p class="text-sm">Personalize seus protocolos! Adicione novas opções terapêuticas dentro de cada doença. Seus dados são salvos localmente; use <strong>Exportar</strong> para backup ou para compartilhar seus protocolos com a equipe.</p>
+                        <p class="text-sm">Personalize seus protocolos! Adicione novas opções terapêuticas dentro de
+                            cada doença. Seus dados são salvos localmente; use <strong>Exportar</strong> para backup ou
+                            para compartilhar seus protocolos com a equipe.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    </div>
     <script src="prescricoesNativas.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/prescriptions.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const currentPage = window.location.pathname.split('/').pop();
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
@@ -148,4 +267,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -2,9 +2,24 @@
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    if(typeof positionPreviewToggle === 'function') {
+    syncStepper(screenId);
+    if (typeof positionPreviewToggle === 'function') {
         positionPreviewToggle();
     }
+}
+
+function syncStepper(screenId) {
+    const stepper = document.querySelector('[data-stepper]');
+    if (!stepper) return;
+    const steps = Array.from(stepper.querySelectorAll('[data-step-target]'));
+    const currentIndex = steps.findIndex(step => step.dataset.stepTarget === screenId);
+    if (currentIndex === -1) return;
+    steps.forEach((step, index) => {
+        const isActive = index === currentIndex;
+        step.classList.toggle('is-active', isActive);
+        step.classList.toggle('is-complete', index < currentIndex);
+        step.setAttribute('aria-current', isActive ? 'step' : 'false');
+    });
 }
 
 function setupTheme() {
@@ -115,7 +130,7 @@ function exportData(type) {
         case 'scales':
             if (typeof customScales !== 'undefined' && Object.keys(customScales).length > 0) {
                 dataToExport = { customScales };
-                fileName = `escalas_config_${new Date().toISOString().slice(0,10)}.json`;
+                fileName = `escalas_config_${new Date().toISOString().slice(0, 10)}.json`;
             } else {
                 showToast('Nenhum dado de escala customizada para exportar.', 'warning');
                 return;
@@ -124,7 +139,7 @@ function exportData(type) {
         case 'prescriptions':
             if (typeof customPrescriptions !== 'undefined' && Object.keys(customPrescriptions).length > 0) {
                 dataToExport = { customPrescriptions };
-                fileName = `prescricoes_config_${new Date().toISOString().slice(0,10)}.json`;
+                fileName = `prescricoes_config_${new Date().toISOString().slice(0, 10)}.json`;
             } else {
                 showToast('Nenhum dado de prescrição customizada para exportar.', 'warning');
                 return;
@@ -159,11 +174,11 @@ function showToast(message, type = 'success', title = '') {
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    
+
     let icon = '';
     let defaultTitle = '';
-    
-    switch(type) {
+
+    switch (type) {
         case 'success':
             icon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
             defaultTitle = 'Sucesso';
@@ -242,7 +257,7 @@ function handleImport(file) {
 window.onclick = (e) => {
     if (e.target.classList.contains('modal')) {
         const closeBtn = e.target.querySelector('.modal-close');
-        if(closeBtn) closeBtn.click();
+        if (closeBtn) closeBtn.click();
     }
 };
 
@@ -307,11 +322,11 @@ function openDrawer(title, contentHtml, onSaveCallback) {
 
     titleEl.textContent = title;
     contentEl.innerHTML = contentHtml;
-    
+
     // Remove event listeners antigos para evitar duplicidade
     const newSaveBtn = saveBtn.cloneNode(true);
     saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-    
+
     if (onSaveCallback) {
         newSaveBtn.onclick = () => {
             onSaveCallback();
@@ -330,7 +345,7 @@ function openDrawer(title, contentHtml, onSaveCallback) {
 function closeDrawer() {
     const drawer = document.getElementById('appDrawer');
     const overlay = document.getElementById('drawerOverlay');
-    
+
     if (drawer) drawer.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
     document.body.style.overflow = '';

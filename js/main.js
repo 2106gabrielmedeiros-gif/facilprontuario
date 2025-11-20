@@ -7,19 +7,19 @@ let likelihoodData = {};
 let editModeEnabled = false;
 
 // ======== INICIALIZAÇÃO ========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadCustomData();
     loadEditModePreference();
     renderExamSelection();
     loadSessionState();
     setupTheme();
     initializeEditModeToggle();
+    initStepperNavigation();
     const panel = document.getElementById('previewPanel');
     const btn = document.getElementById('togglePreviewBtn');
     if (panel && btn) {
         panel.classList.remove('collapsed');
-        btn.textContent = '»';
-        btn.title = 'Ocultar pré-visualização';
+        updatePreviewToggleLabel(true);
         btn.addEventListener('click', togglePreviewPanel);
         positionPreviewToggle();
         window.addEventListener('resize', positionPreviewToggle);
@@ -65,6 +65,34 @@ function requireEditMode() {
     if (editModeEnabled) return true;
     showToast('Ative o modo edição para alterar ou adicionar achados.', 'warning');
     return false;
+}
+
+function initStepperNavigation() {
+    const stepper = document.querySelector('[data-stepper]');
+    if (!stepper) return;
+    stepper.querySelectorAll('[data-step-target]').forEach(button => {
+        button.addEventListener('click', () => handleStepperNavigation(button.dataset.stepTarget));
+    });
+}
+
+function handleStepperNavigation(target) {
+    if (!target) return;
+    if (target === 'screen1') {
+        showScreen('screen1');
+        return;
+    }
+    if (target === 'screen2') {
+        proceedToExam();
+        return;
+    }
+    if (target === 'screen3') {
+        const resultArea = document.getElementById('resultArea');
+        if (!resultArea || !resultArea.textContent.trim()) {
+            showToast('Gere o laudo antes de revisar.', 'warning');
+            return;
+        }
+        showScreen('screen3');
+    }
 }
 
 // ======== NAVEGAÇÃO E LÓGICA DE TELAS ========
@@ -157,7 +185,7 @@ function generateReportText() {
             }
 
             if (categorySentences.length > 0) {
-                 examSectionLines.push(`**${category.name}:** ${categorySentences.join('. ')}.`);
+                examSectionLines.push(`**${category.name}:** ${categorySentences.join('. ')}.`);
             }
 
             if (lineFindings.length > 0) {
@@ -233,7 +261,7 @@ function renderExamSelection() {
     grid.innerHTML = '';
     const allExams = { ...examsData, ...customExams };
     const filterText = (document.getElementById('examSearchInput')?.value || '').toLowerCase();
-    
+
     // Ordenação: Customizados primeiro, depois alfabético
     const filtered = Object.values(allExams).filter(exam => exam.name.toLowerCase().includes(filterText))
         .sort((a, b) => {
@@ -250,7 +278,7 @@ function renderExamSelection() {
         card.dataset.id = exam.id;
         if (selectedExams.includes(exam.id)) card.classList.add('selected');
         const isCustom = exam.id.startsWith('custom_');
-        
+
         card.innerHTML = `
             ${isCustom && editModeEnabled ? '<div class="drag-handle">⋮⋮</div>' : ''}
             <div class="item-content">
@@ -262,8 +290,8 @@ function renderExamSelection() {
                 <button class="icon-btn delete" onclick="deleteExam('${exam.id}', event)" title="Deletar">×</button>
             </div>` : ''}
         `;
-        card.onclick = (e) => { 
-            if (!e.target.closest('.exam-actions') && !e.target.closest('.drag-handle')) toggleExamSelection(exam.id); 
+        card.onclick = (e) => {
+            if (!e.target.closest('.exam-actions') && !e.target.closest('.drag-handle')) toggleExamSelection(exam.id);
         };
         grid.appendChild(card);
     });
@@ -287,7 +315,7 @@ function toggleExamSelection(examId) { const index = selectedExams.indexOf(examI
 
 // ======== DRAWER DE EDIÇÃO DE EXAME ========
 function openEditExamDrawer(examId, event) {
-    if(event) event.stopPropagation();
+    if (event) event.stopPropagation();
     const exam = customExams[examId];
     if (!exam) return;
 
@@ -305,7 +333,7 @@ function openEditExamDrawer(examId, event) {
     openDrawer('Editar Exame', content, () => {
         const name = document.getElementById('drawerExamName').value.trim();
         const desc = document.getElementById('drawerExamDesc').value.trim();
-        
+
         if (!name || !desc) {
             showToast('Nome e descrição são obrigatórios.', 'error');
             return;
@@ -336,23 +364,23 @@ function toggleAddExamForm() {
     openDrawer('Novo Exame', content, () => {
         const nameInput = document.getElementById('drawerNewExamName');
         const descInput = document.getElementById('drawerNewExamDescription');
-        
+
         const name = nameInput ? nameInput.value.trim() : '';
         const desc = descInput ? descInput.value.trim() : '';
-        
+
         if (!name || !desc) {
             showToast('Nome e descrição são obrigatórios.', 'error');
             return;
         }
 
         const id = 'custom_' + Date.now();
-        customExams[id] = { 
-            id, 
-            name, 
-            description: desc, 
-            findings: { 
-                personalizado: { name: "Personalizado", items: [] } 
-            } 
+        customExams[id] = {
+            id,
+            name,
+            description: desc,
+            findings: {
+                personalizado: { name: "Personalizado", items: [] }
+            }
         };
         saveCustomData();
         renderExamSelection();
@@ -361,13 +389,13 @@ function toggleAddExamForm() {
     });
 }
 
-function deleteExam(examId, event) { 
-    if(event) event.stopPropagation();
-    if(confirm('Deletar este exame e todos os seus achados?')){ 
-        delete customExams[examId]; 
-        selectedExams = selectedExams.filter(id => id !== examId); 
-        saveCustomData(); 
-        renderExamSelection(); 
+function deleteExam(examId, event) {
+    if (event) event.stopPropagation();
+    if (confirm('Deletar este exame e todos os seus achados?')) {
+        delete customExams[examId];
+        selectedExams = selectedExams.filter(id => id !== examId);
+        saveCustomData();
+        renderExamSelection();
         showToast('Exame deletado.', 'info');
     }
 }
@@ -394,183 +422,183 @@ function renderFindings() {
         const actionsHtml = actions.length ? `<div class="system-actions">${actions.join('')}</div>` : '';
         header.innerHTML = `${exam.name}${actionsHtml}`;
         systemSection.appendChild(header);
-        
+
         if (exam.findings) {
             Object.entries(exam.findings).forEach(([categoryKey, category]) => {
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'finding-group';
-            const groupTitle = document.createElement('h4');
-            let categoryActions = '';
-            if (editModeEnabled) {
-                const catButtons = [];
-                if (isCustomExam) {
-                    catButtons.push(`<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button>`);
-                    catButtons.push(`<button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>`);
-                }
-                catButtons.push(`<button class="btn btn-success btn-small" onclick="openFindingDrawer('${examId}','${categoryKey}')">+</button>`);
-                categoryActions = `<div class="category-actions">${catButtons.join('')}</div>`;
-            }
-            groupTitle.innerHTML = `<span>${category.name}</span>${categoryActions}`;
-            groupDiv.appendChild(groupTitle);
-
-            const findingsList = document.createElement('div');
-            findingsList.className = 'findings-list';
-            groupDiv.appendChild(findingsList);
-
-            const originalItems = category.items || [];
-            const sortedItems = reorderFindings(originalItems);
-
-            sortedItems.forEach(finding => {
-                if (finding.displayCondition) {
-                    const parentState = findingsState[finding.displayCondition.triggerFindingId];
-                    if (!parentState || parentState.answerId !== finding.displayCondition.triggerAnswerId) {
-                        return;
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'finding-group';
+                const groupTitle = document.createElement('h4');
+                let categoryActions = '';
+                if (editModeEnabled) {
+                    const catButtons = [];
+                    if (isCustomExam) {
+                        catButtons.push(`<button class="icon-btn edit btn-small" onclick="editCategoryName('${examId}','${categoryKey}')" title="Renomear Seção">✎</button>`);
+                        catButtons.push(`<button class="icon-btn delete btn-small" onclick="deleteCategory('${examId}','${categoryKey}')" title="Deletar Seção">×</button>`);
                     }
+                    catButtons.push(`<button class="btn btn-success btn-small" onclick="openFindingDrawer('${examId}','${categoryKey}')">+</button>`);
+                    categoryActions = `<div class="category-actions">${catButtons.join('')}</div>`;
                 }
+                groupTitle.innerHTML = `<span>${category.name}</span>${categoryActions}`;
+                groupDiv.appendChild(groupTitle);
 
-                const stateObj = findingsState[finding.id];
-                const hasSelection = stateObj && (stateObj.answerId !== undefined || stateObj.value);
-                const isCustomFinding = finding.id.startsWith('custom_');
+                const findingsList = document.createElement('div');
+                findingsList.className = 'findings-list';
+                groupDiv.appendChild(findingsList);
 
-                const findingWrapper = document.createElement('div');
-                findingWrapper.className = 'finding-item';
-                findingWrapper.id = `finding-item-${finding.id}`;
-                findingWrapper.dataset.id = finding.id;
-                
-                if (hasSelection) findingWrapper.classList.add('has-selection');
-                if (finding.displayCondition) findingWrapper.classList.add('conditional');
+                const originalItems = category.items || [];
+                const sortedItems = reorderFindings(originalItems);
 
-                // Drag Handle
-                if (editModeEnabled && (isCustomExam || isCustomFinding)) {
-                    const handle = document.createElement('div');
-                    handle.className = 'drag-handle';
-                    handle.innerHTML = '⋮⋮';
-                    findingWrapper.appendChild(handle);
-                }
-
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'item-content';
-
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'finding-question';
-                
-                const questionLabel = document.createElement('span');
-                questionLabel.textContent = finding.question;
-                questionDiv.appendChild(questionLabel);
-
-                if (finding.info) {
-                    const infoBtn = document.createElement('button');
-                    infoBtn.type = 'button';
-                    infoBtn.className = 'info-inline-btn';
-                    infoBtn.setAttribute('aria-label', `Ver instruções para ${finding.question}`);
-                    infoBtn.textContent = 'ⓘ';
-                    infoBtn.onclick = (event) => {
-                        event.stopPropagation();
-                        showInfoDrawer(finding.id);
-                    };
-                    questionDiv.appendChild(infoBtn);
-                }
-                contentDiv.appendChild(questionDiv);
-
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'finding-controls';
-
-                if (finding.type === 'open-text') {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.className = 'finding-detail-input';
-                    input.placeholder = 'Insira o valor...';
-                    input.style.maxWidth = '200px';
-                    input.value = findingsState[finding.id]?.value || '';
-                    input.oninput = (e) => saveOpenTextAnswer(finding.id, e.target.value);
-                    controlsDiv.appendChild(input);
-                } else {
-                    (finding.answers || []).forEach(answer => {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'answer-wrapper';
-
-                        const btn = document.createElement('button');
-                        btn.className = 'toggle-button';
-                        if (answer.isNegative) btn.classList.add('negative');
-                        btn.textContent = answer.text;
-                        if (stateObj && stateObj.answerId === answer.id) {
-                            btn.classList.add('active');
+                sortedItems.forEach(finding => {
+                    if (finding.displayCondition) {
+                        const parentState = findingsState[finding.displayCondition.triggerFindingId];
+                        if (!parentState || parentState.answerId !== finding.displayCondition.triggerAnswerId) {
+                            return;
                         }
-                        btn.onclick = () => selectAnswer(finding.id, answer.id);
-                        wrapper.appendChild(btn);
+                    }
 
-                        if (editModeEnabled) {
-                            const addBtn = document.createElement('button');
-                            addBtn.className = 'add-conditional-btn';
-                            addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
-                            addBtn.innerHTML = '+';
-                            addBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                openConditionalFindingDrawer(examId, categoryKey, finding.id, answer.id);
-                            };
-                            wrapper.appendChild(addBtn);
+                    const stateObj = findingsState[finding.id];
+                    const hasSelection = stateObj && (stateObj.answerId !== undefined || stateObj.value);
+                    const isCustomFinding = finding.id.startsWith('custom_');
+
+                    const findingWrapper = document.createElement('div');
+                    findingWrapper.className = 'finding-item';
+                    findingWrapper.id = `finding-item-${finding.id}`;
+                    findingWrapper.dataset.id = finding.id;
+
+                    if (hasSelection) findingWrapper.classList.add('has-selection');
+                    if (finding.displayCondition) findingWrapper.classList.add('conditional');
+
+                    // Drag Handle
+                    if (editModeEnabled && (isCustomExam || isCustomFinding)) {
+                        const handle = document.createElement('div');
+                        handle.className = 'drag-handle';
+                        handle.innerHTML = '⋮⋮';
+                        findingWrapper.appendChild(handle);
+                    }
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'item-content';
+
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'finding-question';
+
+                    const questionLabel = document.createElement('span');
+                    questionLabel.textContent = finding.question;
+                    questionDiv.appendChild(questionLabel);
+
+                    if (finding.info) {
+                        const infoBtn = document.createElement('button');
+                        infoBtn.type = 'button';
+                        infoBtn.className = 'info-inline-btn';
+                        infoBtn.setAttribute('aria-label', `Ver instruções para ${finding.question}`);
+                        infoBtn.textContent = 'ⓘ';
+                        infoBtn.onclick = (event) => {
+                            event.stopPropagation();
+                            showInfoDrawer(finding.id);
+                        };
+                        questionDiv.appendChild(infoBtn);
+                    }
+                    contentDiv.appendChild(questionDiv);
+
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.className = 'finding-controls';
+
+                    if (finding.type === 'open-text') {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'finding-detail-input';
+                        input.placeholder = 'Insira o valor...';
+                        input.style.maxWidth = '200px';
+                        input.value = findingsState[finding.id]?.value || '';
+                        input.oninput = (e) => saveOpenTextAnswer(finding.id, e.target.value);
+                        controlsDiv.appendChild(input);
+                    } else {
+                        (finding.answers || []).forEach(answer => {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'answer-wrapper';
+
+                            const btn = document.createElement('button');
+                            btn.className = 'toggle-button';
+                            if (answer.isNegative) btn.classList.add('negative');
+                            btn.textContent = answer.text;
+                            if (stateObj && stateObj.answerId === answer.id) {
+                                btn.classList.add('active');
+                            }
+                            btn.onclick = () => selectAnswer(finding.id, answer.id);
+                            wrapper.appendChild(btn);
+
+                            if (editModeEnabled) {
+                                const addBtn = document.createElement('button');
+                                addBtn.className = 'add-conditional-btn';
+                                addBtn.title = `Adicionar achado condicional para a resposta "${answer.text}"`;
+                                addBtn.innerHTML = '+';
+                                addBtn.onclick = (e) => {
+                                    e.stopPropagation();
+                                    openConditionalFindingDrawer(examId, categoryKey, finding.id, answer.id);
+                                };
+                                wrapper.appendChild(addBtn);
+                            }
+                            controlsDiv.appendChild(wrapper);
+                        });
+                    }
+
+                    if (editModeEnabled && isCustomFinding) {
+                        const editBtn = document.createElement('button');
+                        editBtn.className = 'icon-btn edit';
+                        editBtn.innerHTML = '✎';
+                        editBtn.title = 'Editar achado';
+                        editBtn.onclick = () => openFindingDrawer(examId, categoryKey, finding.id);
+                        controlsDiv.appendChild(editBtn);
+                    }
+
+                    contentDiv.appendChild(controlsDiv);
+
+                    // Detalhes adicionais
+                    let detailContainer = null;
+                    if (finding.type !== 'open-text') {
+                        detailContainer = document.createElement('div');
+                        detailContainer.className = 'finding-detail-container';
+                        const detailInputId = `detail-${finding.id}`;
+                        const detailLabel = document.createElement('label');
+                        detailLabel.className = 'detail-label';
+                        detailLabel.setAttribute('for', detailInputId);
+                        detailLabel.textContent = 'Detalhes adicionais';
+
+                        const detailInput = document.createElement('input');
+                        detailInput.type = 'text';
+                        detailInput.id = detailInputId;
+
+                        detailInput.className = 'finding-detail-input';
+                        detailInput.placeholder = 'Adicionar detalhes (opcional)';
+                        detailInput.value = stateObj?.detail || '';
+                        detailInput.oninput = (e) => saveFindingDetail(e, finding.id);
+
+                        detailContainer.appendChild(detailLabel);
+                        detailContainer.appendChild(detailInput);
+                    }
+
+                    findingWrapper.appendChild(questionDiv);
+                    findingWrapper.appendChild(controlsDiv);
+                    if (detailContainer) {
+                        findingWrapper.appendChild(detailContainer);
+                    }
+                    findingsList.appendChild(findingWrapper);
+                });
+
+                if (editModeEnabled && typeof Sortable !== 'undefined') {
+                    new Sortable(findingsList, {
+                        animation: 150,
+                        handle: '.drag-handle',
+                        ghostClass: 'sortable-ghost',
+                        dragClass: 'sortable-drag',
+                        onEnd: function (evt) {
+                            const newOrderIds = Array.from(findingsList.children).map(el => el.dataset.id);
+                            updateFindingsOrder(examId, categoryKey, newOrderIds);
                         }
-                        controlsDiv.appendChild(wrapper);
                     });
                 }
-
-                if (editModeEnabled && isCustomFinding) {
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'icon-btn edit';
-                    editBtn.innerHTML = '✎';
-                    editBtn.title = 'Editar achado';
-                    editBtn.onclick = () => openFindingDrawer(examId, categoryKey, finding.id);
-                    controlsDiv.appendChild(editBtn);
-                }
-
-                contentDiv.appendChild(controlsDiv);
-
-                // Detalhes adicionais
-                let detailContainer = null;
-                if (finding.type !== 'open-text') {
-                    detailContainer = document.createElement('div');
-                    detailContainer.className = 'finding-detail-container';
-                    const detailInputId = `detail-${finding.id}`;
-                    const detailLabel = document.createElement('label');
-                    detailLabel.className = 'detail-label';
-                    detailLabel.setAttribute('for', detailInputId);
-                    detailLabel.textContent = 'Detalhes adicionais';
-
-                    const detailInput = document.createElement('input');
-                    detailInput.type = 'text';
-                    detailInput.id = detailInputId;
-
-                    detailInput.className = 'finding-detail-input';
-                    detailInput.placeholder = 'Adicionar detalhes (opcional)';
-                    detailInput.value = stateObj?.detail || '';
-                    detailInput.oninput = (e) => saveFindingDetail(e, finding.id);
-
-                    detailContainer.appendChild(detailLabel);
-                    detailContainer.appendChild(detailInput);
-                }
-
-                findingWrapper.appendChild(questionDiv);
-                findingWrapper.appendChild(controlsDiv);
-                if (detailContainer) {
-                    findingWrapper.appendChild(detailContainer);
-                }
-                findingsList.appendChild(findingWrapper);
+                systemSection.appendChild(groupDiv);
             });
-
-            if (editModeEnabled && typeof Sortable !== 'undefined') {
-                new Sortable(findingsList, {
-                    animation: 150,
-                    handle: '.drag-handle',
-                    ghostClass: 'sortable-ghost',
-                    dragClass: 'sortable-drag',
-                    onEnd: function (evt) {
-                        const newOrderIds = Array.from(findingsList.children).map(el => el.dataset.id);
-                        updateFindingsOrder(examId, categoryKey, newOrderIds);
-                    }
-                });
-            }
-            systemSection.appendChild(groupDiv);
-        });
         }
         container.appendChild(systemSection);
     });
@@ -618,10 +646,10 @@ function saveOpenTextAnswer(findingId, value) {
 function addDrawerAnswerField(text = '', description = '', isNegative = false) {
     const container = document.getElementById('drawerAnswersContainer');
     if (!container) return;
-    
+
     const div = document.createElement('div');
     div.className = 'answer-input-group flex gap-2 items-center bg-gray-700 p-2 rounded mb-2';
-    
+
     div.innerHTML = `
         <div class="flex-1">
             <input type="text" class="answer-text w-full p-1 bg-gray-800 border border-gray-600 rounded text-white text-sm mb-1" placeholder="Botão (Ex: Sim)" value="${text}">
@@ -640,7 +668,7 @@ function toggleDrawerFindingType() {
     const type = document.getElementById('drawerFindingType').value;
     const answersSection = document.getElementById('drawerAnswersSection');
     const openTextSection = document.getElementById('drawerOpenTextSection');
-    
+
     if (type === 'open-text') {
         answersSection.classList.add('hidden');
         openTextSection.classList.remove('hidden');
@@ -658,7 +686,7 @@ function openFindingDrawer(examId, categoryKey, findingIdOrCondition = null) {
     const findingId = isEdit ? findingIdOrCondition : null;
 
     let finding = isEdit ? findFindingById(findingId) : null;
-    
+
     // Default values
     let question = finding ? finding.question : '';
     let info = finding ? (finding.info || '') : '';
@@ -727,7 +755,7 @@ function saveDrawerFinding(examId, categoryKey, findingId, condition) {
     const question = document.getElementById('drawerFindingQuestion').value.trim();
     const type = document.getElementById('drawerFindingType').value;
     const info = document.getElementById('drawerFindingInfo').value.trim();
-    
+
     if (!question) { showToast('A pergunta é obrigatória.', 'error'); return; }
 
     let newFinding = {
@@ -749,7 +777,7 @@ function saveDrawerFinding(examId, categoryKey, findingId, condition) {
             description: g.querySelector('.answer-description').value.trim(),
             isNegative: g.querySelector('.answer-is-negative').checked
         })).filter(a => a.text);
-        
+
         if (answers.length === 0) { showToast('Adicione pelo menos uma resposta.', 'error'); return; }
         newFinding.answers = answers;
         // Auto-detect type based on answers if not explicitly open-text
@@ -811,7 +839,7 @@ function showInfoDrawer(findingId) {
     const finding = findFindingById(findingId);
     const infoText = finding?.info;
     if (!infoText || !infoText.trim()) { showToast("Nenhuma informação adicional disponível.", 'info'); return; }
-    
+
     openDrawer('Informações', `<div class="text-gray-300 leading-relaxed">${infoText}</div>`);
 }
 
@@ -823,7 +851,7 @@ function updatePreview() { document.getElementById('previewContent').textContent
 // Funções de categoria mantidas para compatibilidade (serão substituídas por Drawers futuramente)
 function addCategory(examId) {
     if (!requireEditMode()) return;
-    
+
     const content = `
         <div class="form-group">
             <label class="block mb-1 font-semibold">Nome da Nova Seção</label>
@@ -834,7 +862,7 @@ function addCategory(examId) {
     openDrawer('Nova Seção', content, () => {
         const name = document.getElementById('drawerCategoryName').value.trim();
         if (!name) { showToast('Nome é obrigatório', 'error'); return; }
-        
+
         const catKey = 'cat_' + Date.now();
         customExams[examId].findings[catKey] = { name, items: [] };
         saveCustomData();
@@ -847,7 +875,7 @@ function addCategory(examId) {
 function editCategoryName(examId, catKey) {
     if (!requireEditMode()) return;
     const currentName = customExams[examId].findings[catKey].name;
-    
+
     const content = `
         <div class="form-group">
             <label class="block mb-1 font-semibold">Nome da Seção</label>
@@ -858,7 +886,7 @@ function editCategoryName(examId, catKey) {
     openDrawer('Renomear Seção', content, () => {
         const newName = document.getElementById('drawerCategoryName').value.trim();
         if (!newName) { showToast('Nome é obrigatório', 'error'); return; }
-        
+
         customExams[examId].findings[catKey].name = newName;
         saveCustomData();
         renderFindings();
@@ -866,48 +894,53 @@ function editCategoryName(examId, catKey) {
         showToast('Seção renomeada!', 'success');
     });
 }
-function deleteCategory(examId, catKey) { if (!requireEditMode()) return; const cat = customExams[examId].findings[catKey]; if(confirm(`Deletar a seção "${cat.name}" e seus ${cat.items.length} achados?`)){ delete customExams[examId].findings[catKey]; saveCustomData(); renderFindings(); }}
+function deleteCategory(examId, catKey) { if (!requireEditMode()) return; const cat = customExams[examId].findings[catKey]; if (confirm(`Deletar a seção "${cat.name}" e seus ${cat.items.length} achados?`)) { delete customExams[examId].findings[catKey]; saveCustomData(); renderFindings(); } }
 
+
+function updatePreviewToggleLabel(isOpen) {
+    const btn = document.getElementById('togglePreviewBtn');
+    if (!btn) return;
+    btn.textContent = isOpen ? 'Ocultar painel' : 'Mostrar painel';
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    btn.setAttribute('aria-label', isOpen ? 'Ocultar pré-visualização' : 'Mostrar pré-visualização');
+}
 
 function positionPreviewToggle() {
-  const panel = document.getElementById('previewPanel');
-  const btn = document.getElementById('togglePreviewBtn');
-  if (!panel || !btn) return;
+    const panel = document.getElementById('previewPanel');
+    const btn = document.getElementById('togglePreviewBtn');
+    if (!panel || !btn) return;
 
-  const rootStyles = getComputedStyle(document.documentElement);
-  const panelWidth = parseInt(rootStyles.getPropertyValue('--panel-width')) || 300;
-  const panelOffset = parseInt(rootStyles.getPropertyValue('--panel-offset-right')) || 20;
-  const screen2IsActive = document.getElementById('screen2').classList.contains('active');
+    const rootStyles = getComputedStyle(document.documentElement);
+    const panelWidth = parseInt(rootStyles.getPropertyValue('--panel-width')) || 300;
+    const panelOffset = parseInt(rootStyles.getPropertyValue('--panel-offset-right')) || 20;
+    const screen2 = document.getElementById('screen2');
+    const screen2IsActive = screen2 && screen2.classList.contains('active');
 
-  if (!screen2IsActive) {
-    btn.classList.add('collapse-edge');
-    btn.style.right = `${panelOffset}px`;
-    return;
-  }
+    if (!screen2IsActive) {
+        btn.classList.add('collapse-edge', 'is-hidden');
+        btn.setAttribute('aria-hidden', 'true');
+        btn.style.right = `${panelOffset}px`;
+        return;
+    }
 
-  if (panel.classList.contains('collapsed')) {
-    btn.classList.add('collapse-edge');
-    btn.style.right = `${panelOffset}px`;
-  } else {
-    btn.classList.remove('collapse-edge');
-    btn.style.right = `${panelOffset + panelWidth + 8}px`;
-  }
+    btn.classList.remove('is-hidden');
+    btn.removeAttribute('aria-hidden');
+
+    if (panel.classList.contains('collapsed')) {
+        btn.classList.add('collapse-edge');
+        btn.style.right = `${panelOffset}px`;
+    } else {
+        btn.classList.remove('collapse-edge');
+        btn.style.right = `${panelOffset + panelWidth + 8}px`;
+    }
 }
 
 function togglePreviewPanel() {
-  const panel = document.getElementById('previewPanel');
-  const btn = document.getElementById('togglePreviewBtn');
-
-  panel.classList.toggle('collapsed');
-
-  if (panel.classList.contains('collapsed')) {
-    btn.textContent = '«';
-    btn.title = 'Mostrar pré-visualização';
-  } else {
-    btn.textContent = '»';
-    btn.title = 'Ocultar pré-visualização';
-  }
-  positionPreviewToggle();
+    const panel = document.getElementById('previewPanel');
+    if (!panel) return;
+    const isCollapsed = panel.classList.toggle('collapsed');
+    updatePreviewToggleLabel(!isCollapsed);
+    positionPreviewToggle();
 }
 
 function updateFindingsOrder(examId, categoryKey, newOrderIds) {
@@ -920,13 +953,13 @@ function updateFindingsOrder(examId, categoryKey, newOrderIds) {
 
     // Create a map for quick lookup
     const itemsMap = new Map(itemsArray.map(item => [item.id, item]));
-    
+
     // Reconstruct the array based on new order
     // Note: newOrderIds might not contain all items if some are hidden (conditional)
     // But Sortable usually works on the visible list.
     // If we have conditional logic, reordering might be tricky.
     // For now, we assume flat reordering of what's visible.
-    
+
     const newItems = [];
     const seenIds = new Set();
 

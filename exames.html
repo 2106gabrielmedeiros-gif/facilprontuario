@@ -1,226 +1,385 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark" data-theme="dark">
+<html lang="pt-BR" class="scroll-smooth dark" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prontuário Fácil | Exames</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="min-h-screen text-slate-100 antialiased transition-colors duration-500">
-    <nav class="app-nav glass-nav mx-auto mt-6 max-w-6xl">
-        <div class="flex flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:gap-6">
-            <a href="index.html" class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300">Prontuário Fácil</a>
-            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold w-full md:flex-1 md:justify-center md:flex-nowrap">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="exames.html" class="nav-link active">Exames</a>
-                <a href="escalas/index.html" class="nav-link">Escalas</a>
-                <a href="prescricoes/index.html" class="nav-link">Prescrições</a>
-                <a href="#" onclick="openHelpModal()" class="nav-link">Ajuda</a>
-            </div>
-            <div class="flex flex-wrap items-center justify-end gap-1.5 bg-white/5 rounded-2xl px-3 py-2 border border-white/10 w-full md:w-auto md:flex-nowrap md:justify-end">
-                <button id="editModeToggleBtn" type="button" class="edit-mode-toggle" aria-pressed="false">
-                    <span class="status-dot" aria-hidden="true"></span>
-                    <span class="toggle-label">Modo edição</span>
-                    <span class="state-text" aria-live="polite">OFF</span>
-                </button>
-                <button id="export-button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:text-black hover:shadow-md transition">Exportar</button>
-                <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100/70 dark:bg-slate-800/70 text-gray-700 dark:text-gray-200 hover:bg-white hover:shadow-md hover:text-black transition cursor-pointer">
-                    Importar <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
-                </label>
-                <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500/90 text-white shadow-md hover:bg-rose-500" onclick="masterReset()">Reset</button>
-            </div>
+
+<body class="text-slate-100 antialiased min-h-screen flex flex-col">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div
+            class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-sky-500/10 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+        <div
+            class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-emerald-500/5 blur-[100px] rounded-full mix-blend-screen">
+        </div>
+    </div>
+
+    <nav class="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between px-6 py-6 relative z-20">
+        <a href="index.html" class="text-2xl font-bold tracking-tight text-white">Prontuário <span
+                class="text-sky-400">Fácil</span></a>
+
+        <div class="hidden md:flex gap-1 p-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+            <a href="index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Home</a>
+            <a href="exames.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-white/10 shadow-sm transition-all">Exames</a>
+            <a href="escalas/index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Escalas</a>
+            <a href="prescricoes/index.html"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Prescrições</a>
+            <a href="#" onclick="openHelpModal()"
+                class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Ajuda</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="editModeToggleBtn" type="button"
+                class="edit-mode-toggle flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-medium text-slate-300 transition-all">
+                <span class="w-2 h-2 rounded-full bg-slate-500 status-dot"></span>
+                <span class="toggle-label">Edição</span>
+            </button>
+
+            <div class="h-6 w-px bg-white/10 mx-1"></div>
+
+            <button id="export-button"
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all"
+                title="Exportar Dados">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+            </button>
+            <label
+                class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+                title="Importar Dados">
+                <input type="file" accept="application/json" onchange="handleImport(this.files[0])" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+            </label>
+            <button onclick="masterReset()"
+                class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all"
+                title="Resetar Tudo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+            </button>
         </div>
     </nav>
-    <header class="page-hero px-6">
-        <span class="page-hero__badge">Exames físicos</span>
-        <h1>Monte laudos consistentes com roteiros ricos e instruções clínicas integradas.</h1>
-        <p>Selecione os sistemas necessários, personalize perguntas, consulte dicas rápidas e gere descrições completas em segundos.</p>
-        <div class="hero-actions">
-            <button class="btn btn-primary" onclick="document.getElementById('screen1').scrollIntoView({behavior:'smooth'});">Começar seleção</button>
-            <div class="meta">
-                <span>Dados locais</span>
-                <span>Fluxo salvo</span>
+
+    <header class="relative z-10 px-6 py-12 text-center max-w-4xl mx-auto">
+        <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-widest mb-6">
+            Exames Físicos
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">Laudos consistentes em segundos.</h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+            Selecione os sistemas, registre os achados com cliques e gere descrições técnicas perfeitas automaticamente.
+        </p>
+    </header>
+
+    <main class="flex-1 relative z-10">
+        <div class="flow-stepper glass mb-8 max-w-xl mx-auto" data-stepper>
+            <button type="button" class="flow-step is-active" data-step-index="0" data-step-target="screen1">
+                <span class="flow-step__number">1</span>
+                <span class="flow-step__label">Roteiros</span>
+            </button>
+            <div class="w-12 h-px bg-white/10"></div>
+            <button type="button" class="flow-step" data-step-index="1" data-step-target="screen2">
+                <span class="flow-step__number">2</span>
+                <span class="flow-step__label">Achados</span>
+            </button>
+            <div class="w-12 h-px bg-white/10"></div>
+            <button type="button" class="flow-step" data-step-index="2" data-step-target="screen3">
+                <span class="flow-step__number">3</span>
+                <span class="flow-step__label">Laudo</span>
+            </button>
+        </div>
+
+        <div id="screen1" class="screen active container mx-auto max-w-7xl px-6 pb-12">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="glass p-6 rounded-2xl sticky top-24">
+                        <h2 class="text-xl font-bold mb-2 text-white">Roteiros</h2>
+                        <p class="text-slate-400 text-sm mb-6">Selecione os sistemas para compor seu exame.</p>
+                        <div class="relative">
+                            <input type="text" id="examSearchInput" onkeyup="renderExamSelection()"
+                                placeholder="Buscar roteiro..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all placeholder:text-slate-500 text-white">
+                            <svg class="absolute left-3 top-3 w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-9">
+                    <div class="exam-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="examGrid"></div>
+
+                    <div class="fixed bottom-6 right-6 z-40 flex gap-3">
+                        <button class="btn btn-secondary glass backdrop-blur-xl shadow-2xl"
+                            onclick="toggleAddExamForm()">
+                            <span class="text-lg mr-1">+</span> Novo
+                        </button>
+                        <button class="btn btn-primary shadow-2xl shadow-sky-500/20" onclick="proceedToExam()">
+                            Prosseguir <span class="ml-2">→</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
-    <div class="page-shell">
-            
-                <div id="screen1" class="screen active container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div class="md:col-span-1">
-                                <div class="glass-panel p-6 h-full sidebar-panel">
-                                <h2 class="text-2xl font-bold mb-2">Roteiros de Exame Físico</h2>
-                                <p class="text-slate-300 mb-4">Selecione um ou mais roteiros abaixo para iniciar a geração do seu laudo.</p>
-                                <input type="text" id="examSearchInput" onkeyup="renderExamSelection()" placeholder="Buscar exame por nome..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                </div>
-                            </div>
-                            <div class="md:col-span-2">
-                                <div class="exam-grid" id="examGrid"></div>
-                                <div class="button-group mt-6">
-                                    <button class="btn btn-primary" onclick="proceedToExam()">Prosseguir</button>
-                                    <button class="btn btn-secondary" onclick="toggleAddExamForm()">Adicionar Novo Exame</button>
-                                </div>
-                                <div id="addExamForm" class="add-exam-form hidden mt-6 glass-panel p-6">
-                                <h3 id="examFormTitle" class="text-xl font-bold mb-4">Adicionar Novo Exame</h3>
-                                <div class="space-y-4">
-                                    <div class="form-group"><label for="newExamName" class="block mb-1">Nome:</label><input type="text" id="newExamName" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                                    <div class="form-group"><label for="newExamDescription" class="block mb-1">Descrição:</label><input type="text" id="newExamDescription" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></div>
-                                    <div class="button-group"><button id="saveExamBtn" class="btn btn-success" onclick="addNewExam()">Adicionar</button><button class="btn btn-secondary" onclick="toggleAddExamForm()">Cancelar</button></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                
-                <div id="screen2" class="screen container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <h2 class="text-2xl font-bold mb-4">Registre os Achados</h2>
-                        <div id="findingsContainer"></div>
-                        <div class="button-group mt-6"><button class="btn btn-secondary" onclick="backToSelection()">Voltar</button><button class="btn btn-primary" onclick="generateReport()">Gerar Laudo</button></div>
-                        <button id="togglePreviewBtn" class="toggle-preview-btn" aria-label="Alternar pré-visualização">»</button>
-                        <div id="previewPanel" class="preview-panel">
-                            <h3 class="text-xl font-bold mb-2">Pré-visualização</h3>
-                            <div id="previewContent">Selecione os achados...</div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div id="screen3" class="screen container mx-auto max-w-6xl px-6 py-12">
-                    <div class="glass-panel p-6 md:p-10">
-                        <h2 class="text-2xl font-bold mb-4">Descrição do Exame Físico</h2>
-                        <div id="resultArea" class="result-area glass-panel mt-4 p-4"></div>
-                        <div class="button-group mt-6"><button class="btn btn-success" onclick="copyToClipboard()">Copiar</button><button class="btn btn-primary" onclick="newExam()">Novo Exame</button></div>
-                    </div>
-                </div>
-                
-                <div id="findingModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 id="findingModalTitle" class="text-xl font-bold">Adicionar/Editar Achado</h3>
-                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeFindingModal()">&times;</button>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div class="form-group">
-                                <label for="findingType" class="block mb-1">Tipo de Pergunta:</label>
-                                <select id="findingType" onchange="updateFindingModalUI()" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <option value="multiple-choice">Múltipla Escolha / Sim-Não</option>
-                                    <option value="open-text">Texto Aberto (ex: Sinais Vitais)</option>
-                                </select>
-                            </div>
-            
-                            <div class="form-group">
-                                <label for="findingQuestion" class="block mb-1">Pergunta:</label>
-                                <input type="text" id="findingQuestion" placeholder="Ex: Bulhas cardíacas? ou Frequência Cardíaca" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
-                            </div>
-                            
-                            <div class="bordered-section">
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="checkbox" id="conditionalCheckbox" onclick="toggleConditionalUI()" class="rounded">
-                                    <strong>Exibição Condicional</strong>
-                                </label>
-                                <div id="conditionalControls" class="hidden mt-4 pl-4">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Exibir este achado somente se:</p>
-                                    <div class="form-group mt-2">
-                                        <label for="triggerFindingSelect" class="block mb-1">A resposta para o achado...</label>
-                                        <select id="triggerFindingSelect" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></select>
-                                    </div>
-                                    <div class="form-group mt-2">
-                                        <label for="triggerAnswerSelect" class="block mb-1">...for igual a...</label>
-                                        <select id="triggerAnswerSelect" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="reportLabelGroup" class="form-group hidden">
-                                <label for="findingReportLabel" class="block mb-1">Etiqueta para o Laudo (ex: FC):</label>
-                                <input type="text" id="findingReportLabel" placeholder="Ex: FC, PA, FR, SpO2" class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md">
-                            </div>
-            
-                            <div id="answersGroup">
-                                <div class="form-group">
-                                    <label class="block mb-1">Respostas Possíveis:</label>
-                                    <div id="answersContainer" class="space-y-2"></div>
-                                    <button class="btn btn-secondary btn-small mt-2" onclick="addAnswerField()">+ Adicionar Resposta</button>
-                                </div>
-                            </div>
-            
-                            <div class="form-group">
-                                <label for="findingInfo" class="block mb-1">Texto de Informação (Opcional):</label>
-                                <textarea id="findingInfo" rows="4" placeholder="Explique o que é este achado..." class="w-full p-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md"></textarea>
-                            </div>
-                            <div class="button-group"><button id="saveFindingBtn" class="btn btn-success">Salvar</button><button class="btn btn-secondary" onclick="closeFindingModal()">Cancelar</button></div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div id="infoModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 class="text-xl font-bold">Informações sobre o Achado</h3>
-                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeInfoModal()">&times;</button>
-                        </div>
-                        <div id="infoModalContent" class="prose dark:prose-invert max-w-none"></div>
-                    </div>
-                </div>
-            
-                <div id="helpModal" class="modal">
-                    <div class="modal-content p-6">
-                        <div class="modal-header border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-                            <h3 class="text-xl font-bold">Como Usar o Prontuário Fácil</h3>
-                            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeHelpModal()">&times;</button>
-                        </div>
-                        <div id="helpModalContent" class="prose dark:prose-invert max-w-none text-slate-300">
-                            <p class="mb-4 text-lg">O módulo de <strong>Exames Físicos</strong> permite a documentação rápida e padronizada de achados clínicos.</p>
-                            
-                            <div class="space-y-4">
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-sky-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-sky-500/20 text-sky-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                                        Seleção de Roteiros
-                                    </h4>
-                                    <p class="text-sm">Escolha os sistemas ou regiões que deseja examinar (ex: Cardiovascular, Respiratório). Você pode selecionar múltiplos roteiros simultaneamente para compor um exame completo.</p>
-                                </div>
 
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-emerald-500/20 text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                        Registro de Achados
-                                    </h4>
-                                    <p class="text-sm">Responda às perguntas de cada seção. O sistema suporta respostas rápidas (Sim/Não) e campos de texto livre para dados quantitativos (ex: Sinais Vitais). O laudo é montado em tempo real.</p>
-                                </div>
+        <div id="screen2" class="screen container mx-auto max-w-7xl px-6 pb-12">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8">
+                    <div class="glass rounded-2xl overflow-hidden">
+                        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900/30">
+                            <h2 class="text-xl font-bold text-white">Registro de Achados</h2>
+                            <button class="btn btn-sm btn-secondary" onclick="backToSelection()">Voltar</button>
+                        </div>
+                        <div id="findingsContainer" class="p-6 space-y-8"></div>
+                    </div>
+                </div>
 
-                                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                                    <h4 class="text-violet-400 font-semibold mb-2 flex items-center gap-2">
-                                        <span class="bg-violet-500/20 text-violet-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
-                                        Personalização
-                                    </h4>
-                                    <p class="text-sm">Você pode adicionar novos achados ou perguntas específicas a qualquer momento, além de criar seus próprios roteiros de exame personalizados para uso futuro.</p>
-                                </div>
+                <div class="lg:col-span-4">
+                    <div class="sticky top-24 space-y-4">
+                        <div id="previewPanel" class="glass rounded-2xl p-6 border-l-4 border-l-sky-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-sky-400">Pré-visualização
+                                </h3>
+                                <span class="text-xs text-slate-500">Tempo real</span>
+                            </div>
+                            <div id="previewContent"
+                                class="text-sm text-slate-300 leading-relaxed font-mono bg-slate-950/50 p-4 rounded-lg border border-white/5 min-h-[100px]">
+                                Selecione os achados para visualizar o laudo...
+                            </div>
+                            <button class="btn btn-primary w-full mt-4" onclick="generateReport()">
+                                Finalizar Laudo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen3" class="screen container mx-auto max-w-4xl px-6 py-12">
+            <div class="glass rounded-2xl p-8 md:p-12 text-center space-y-8">
+                <div
+                    class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                </div>
+
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Laudo Gerado</h2>
+                    <p class="text-slate-400">Pronto para copiar e colar no prontuário.</p>
+                </div>
+
+                <div id="resultArea"
+                    class="text-left bg-slate-950 p-6 rounded-xl border border-white/10 font-mono text-sm text-slate-300 leading-relaxed shadow-inner">
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="btn btn-secondary" onclick="backToSelection()">Editar</button>
+                    <button class="btn btn-success px-8" onclick="copyToClipboard()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copiar Texto
+                    </button>
+                    <button class="btn btn-primary" onclick="newExam()">Novo Exame</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="findingModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 id="findingModalTitle" class="text-xl font-bold text-white">Adicionar/Editar Achado</h3>
+                <button type="button" class="text-slate-400 hover:text-white transition-colors"
+                    onclick="closeFindingModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="form-group">
+                    <label for="findingType" class="block mb-1 text-sm font-medium text-slate-300">Tipo de
+                        Pergunta:</label>
+                    <select id="findingType" onchange="updateFindingModalUI()"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-sky-500/50 outline-none">
+                        <option value="multiple-choice">Múltipla Escolha / Sim-Não</option>
+                        <option value="open-text">Texto Aberto (ex: Sinais Vitais)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="findingQuestion" class="block mb-1 text-sm font-medium text-slate-300">Pergunta:</label>
+                    <input type="text" id="findingQuestion" placeholder="Ex: Bulhas cardíacas? ou Frequência Cardíaca"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-sky-500/50 outline-none">
+                </div>
+
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="conditionalCheckbox" onclick="toggleConditionalUI()"
+                            class="rounded border-white/20 bg-slate-900/50 text-sky-500 focus:ring-sky-500/50">
+                        <span class="font-medium text-white">Exibição Condicional</span>
+                    </label>
+                    <div id="conditionalControls" class="hidden mt-4 pl-4 border-l-2 border-white/10">
+                        <p class="text-xs text-slate-400 mb-3">Exibir este achado somente se:</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="triggerFindingSelect" class="block mb-1 text-xs text-slate-300">A
+                                    resposta
+                                    para...</label>
+                                <select id="triggerFindingSelect"
+                                    class="w-full p-2 bg-slate-900/50 border border-white/10 rounded-lg text-sm text-white"></select>
+                            </div>
+                            <div>
+                                <label for="triggerAnswerSelect" class="block mb-1 text-xs text-slate-300">...for
+                                    igual
+                                    a...</label>
+                                <select id="triggerAnswerSelect"
+                                    class="w-full p-2 bg-slate-900/50 border border-white/10 rounded-lg text-sm text-white"></select>
                             </div>
                         </div>
                     </div>
                 </div>
-            
+
+                <div id="reportLabelGroup" class="form-group hidden">
+                    <label for="findingReportLabel" class="block mb-1 text-sm font-medium text-slate-300">Etiqueta
+                        para
+                        o Laudo:</label>
+                    <input type="text" id="findingReportLabel" placeholder="Ex: FC, PA, FR, SpO2"
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-sky-500/50 outline-none">
+                </div>
+
+                <div id="answersGroup">
+                    <div class="form-group">
+                        <label class="block mb-1 text-sm font-medium text-slate-300">Respostas Possíveis:</label>
+                        <div id="answersContainer" class="space-y-2 mb-3"></div>
+                        <button class="btn btn-sm btn-secondary w-full border-dashed" onclick="addAnswerField()">+
+                            Adicionar Resposta</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="findingInfo" class="block mb-1 text-sm font-medium text-slate-300">Texto de
+                        Informação
+                        (Opcional):</label>
+                    <textarea id="findingInfo" rows="3" placeholder="Explique o que é este achado..."
+                        class="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-sky-500/50 outline-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-white/10">
+                <button class="btn btn-secondary" onclick="closeFindingModal()">Cancelar</button>
+                <button id="saveFindingBtn" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <div id="infoModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-6 rounded-2xl max-w-lg w-full mx-4">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-bold text-white">Informações</h3>
+                <button type="button" class="text-slate-400 hover:text-white"
+                    onclick="closeInfoModal()">&times;</button>
+            </div>
+            <div id="infoModalContent" class="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed">
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal backdrop-blur-sm">
+        <div class="modal-content glass p-8 rounded-2xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-bold text-white">Como Usar</h3>
+                <button type="button" class="text-slate-400 hover:text-white"
+                    onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div id="helpModalContent" class="space-y-6">
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex-shrink-0 flex items-center justify-center font-bold">
+                        1</div>
+                    <div>
+                        <h4 class="text-white font-semibold mb-1">Selecione Roteiros</h4>
+                        <p class="text-slate-400 text-sm">Escolha os sistemas que deseja examinar. Você pode
+                            combinar
+                            múltiplos roteiros.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex-shrink-0 flex items-center justify-center font-bold">
+                        2</div>
+                    <div>
+                        <h4 class="text-white font-semibold mb-1">Registre Achados</h4>
+                        <p class="text-slate-400 text-sm">Responda às perguntas. O laudo é gerado automaticamente
+                            conforme você clica.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-full bg-violet-500/20 text-violet-400 flex-shrink-0 flex items-center justify-center font-bold">
+                        3</div>
+                    <div>
+                        <h4 class="text-white font-semibold mb-1">Copie o Laudo</h4>
+                        <p class="text-slate-400 text-sm">Revise o texto final e copie para seu prontuário
+                            eletrônico.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="dadosnativos.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPage = window.location.pathname.split('/').pop();
-            const navLinks = document.querySelectorAll('.nav-link');
+        document.addEventListener('DOMContentLoaded', function () {
+            // Highlight active nav link
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('nav a');
             navLinks.forEach(link => {
-                const linkPage = link.getAttribute('href').split('/').pop();
-                if (linkPage === currentPage || (currentPage === '' && linkPage === 'index.html')) {
-                    link.classList.add('selected');
+                if (link.getAttribute('href') === 'exames.html') {
+                    link.classList.add('text-white', 'bg-white/10');
+                    link.classList.remove('text-slate-400');
                 }
             });
         });
     </script>
 </body>
+
 </html>
